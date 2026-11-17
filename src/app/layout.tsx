@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import Navbar from "@/components/shared/navbar/Navbar";
-import Footer from "@/components/shared/footer/Footer";
+
 
 const domaine = localFont({
   src: "../assets/fonts/domaine-display-condensed-medium.ttf",
@@ -37,9 +36,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${domaine.variable} ${generalSans.variable} ${robotoFlex.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-[#F5EDE3] font-body text-[#2A1A10]">
-        <Navbar />
         {children}
-        <Footer />
       </body>
     </html>
   );
