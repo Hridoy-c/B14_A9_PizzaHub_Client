@@ -81,3 +81,46 @@ weight contrast via color and letter-spacing rather than jumping past the range.
 | Brown (headings) | `#3B2417` | logo, headings, outline buttons |
 | Muted brown | `#7A6455` | nav links, secondary text |
 | Crust orange | `#B9733A` | accent, "Hub" in logo, primary button |
+
+## Logo & app icons
+
+The brand mark is one shape everywhere: a **pizza slice** — brown body, orange crust
+band along the base, three cream dots.
+
+**Component**: `src/components/shared/navbar/Logo.tsx`
+
+```tsx
+<Logo />                              // dark, for the cream navbar
+<Logo tone="light" onClick={close} />  // cream mark, for the brown mobile panel
+```
+
+- `PizzaMark` is the bare SVG (accepts `tone` and `className`), `Logo` is the mark +
+  the `Pizza`/`Hub` wordmark inside a `next/link`.
+- Mark size is `size-6 md:size-7` (24 / 28px), wordmark is Domaine at
+  `clamp(1.4rem,1.15rem+1.1vw,1.75rem)`. Keep the mark roughly the same height as the
+  cap-height of the wordmark.
+- `tone="dark"` → `#3B2417` body, `#F5EDE3` dots (cream backgrounds).
+- `tone="light"` → `#F5EDE3` body, `#3B2417` dots (dark backgrounds). The crust stays
+  `#B9733A` in both. Never render the dark mark on a dark surface — it disappears.
+- Geometry is tuned to stay readable at 16px: apex `(16, 3.5)`, base corners
+  `(4.2, 26.6)` / `(27.8, 26.6)`, curved base, crust band ~3.6px. Do not add details
+  (no thin lines, no text, no gradients) — they vanish in the browser tab.
+
+**Browser tab / app icons** (Next.js file conventions, no `<link>` tags in code):
+
+| File | Role | Notes |
+| --- | --- | --- |
+| `src/app/icon.svg` | source of truth for the mark | served as `type="image/svg+xml" sizes="any"` |
+| `src/app/favicon.ico` | legacy + taskbar | generated, 16/32/48 PNG-in-ICO |
+| `src/app/apple-icon.png` | iOS home screen | generated, 180×180 on cream |
+
+`favicon.ico` and `apple-icon.png` are **build artefacts** — never edit them by hand.
+Change the SVG, then run:
+
+```bash
+npm run icons        # scripts/generate-icons.mjs, uses sharp
+```
+
+If you change the mark's colours or geometry, update **both** the SVG and
+`MARK_COLORS` in `Logo.tsx` so the tab icon and the navbar stay identical.
+

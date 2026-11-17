@@ -1,17 +1,13 @@
 import React from 'react'
 import Link from 'next/link'
+import Logo from './Logo'
 import MobileMenu from './MobileMenu'
 
 const Navbar = () => {
   return (
     <header className="sticky top-0 z-30 w-full border-b border-[#EADBC8] bg-[#F5EDE3]">
       <nav className="mx-auto flex w-[90vw] items-center justify-between py-2.5 font-sans md:py-3">
-        <Link
-          href="/"
-          className="font-display text-[clamp(1.4rem,1.15rem+1.1vw,1.75rem)] leading-none tracking-tight text-[#3B2417]"
-        >
-          Pizza<span className="text-[#B9733A]">Hub</span>
-        </Link>
+        <Logo />
 
         <ul className="hidden items-center gap-5 text-[0.9375rem] md:flex lg:gap-7">
           <li>

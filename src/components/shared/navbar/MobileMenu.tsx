@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
+import Logo from './Logo'
 
 type IconButtonProps = {
   label: string
@@ -63,9 +64,7 @@ const MobileMenu = () => {
         }`}
       >
         <div className="flex items-center justify-between">
-          <span className="font-display text-[clamp(1.3rem,1.1rem+1.5vw,1.6rem)] leading-none tracking-tight text-[#F5EDE3]">
-            Pizza<span className="text-[#B9733A]">Hub</span>
-          </span>
+          <Logo tone="light" onClick={close} />
           <IconButton
             label="Close menu"
             onClick={close}
