@@ -9,15 +9,15 @@ type GridRuleProps = {
 }
 
 /**
- * Full-bleed decorative strip of thin vertical rules on the cream background.
- * 6 columns = 5 hairlines, matching the brand grid.
+ * Full-bleed decorative strip of vertical rules on the cream background.
+ * 6 columns = 5 rules, matching the brand grid.
  */
 const GridRule = ({ columns = 6, className = '' }: GridRuleProps) => {
   return (
     <div
       aria-hidden="true"
       className={cn(
-        'flex h-16 w-full divide-x divide-[#EADBC8] md:h-24',
+        'flex h-20 w-full divide-x-2 divide-[#EADBC8] md:h-28',
         className,
       )}
     >

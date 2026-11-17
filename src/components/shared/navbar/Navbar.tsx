@@ -6,10 +6,10 @@ import MobileMenu from './MobileMenu'
 const Navbar = () => {
   return (
     <header className="sticky top-0 z-30 w-full border-b border-[#EADBC8] bg-[#F5EDE3]">
-      <nav className="mx-auto flex w-[90vw] items-center justify-between py-2.5 font-sans md:py-3">
+      <nav className="mx-auto flex w-[90vw] items-center justify-between py-3 font-sans md:py-3.5">
         <Logo />
 
-        <ul className="hidden items-center gap-5 text-[0.9375rem] md:flex lg:gap-7">
+        <ul className="hidden items-center gap-5 text-[1rem] md:flex lg:gap-7">
           <li>
             <Link href="/" className="text-[#7A6455] transition-colors hover:text-[#B9733A]">
               Home
@@ -22,16 +22,16 @@ const Navbar = () => {
           </li>
         </ul>
 
-        <div className="hidden items-center gap-2.5 text-[0.875rem] md:flex">
+        <div className="hidden items-center gap-3 text-[0.9375rem] md:flex">
           <Link
             href="/sign-in"
-            className="rounded-full border border-[#3B2417] px-4 py-1.5 text-[#3B2417] transition-colors hover:bg-[#3B2417] hover:text-[#F5EDE3]"
+            className="rounded-full border border-[#3B2417] px-5 py-2 text-[#3B2417] transition-colors hover:bg-[#3B2417] hover:text-[#F5EDE3]"
           >
             Sign In
           </Link>
           <Link
             href="/sign-up"
-            className="rounded-full bg-[#B9733A] px-4 py-1.5 text-[#F5EDE3] transition-colors hover:bg-[#2A1A10]"
+            className="rounded-full bg-[#B9733A] px-5 py-2 text-[#F5EDE3] transition-colors hover:bg-[#2A1A10]"
           >
             Sign Up
           </Link>

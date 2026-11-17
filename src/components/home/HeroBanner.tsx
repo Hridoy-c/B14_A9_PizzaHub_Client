@@ -8,7 +8,7 @@ const badgeClass =
 export default function HeroBanner() {
   return (
     <section className="relative isolate w-full overflow-hidden">
-      <div className="mx-auto flex w-[90vw] max-w-[1200px] flex-col items-center gap-8 pt-10 pb-14 md:gap-10 md:pt-14 md:pb-20 lg:min-h-[calc(100svh-3.5rem)] lg:justify-center lg:gap-5 lg:pt-4 lg:pb-6">
+      <div className="mx-auto flex w-[90vw] max-w-[1200px] flex-col items-center gap-8 pt-10 pb-14 md:gap-10 md:pt-14 md:pb-20 lg:min-h-[calc(100svh-4.25rem)] lg:justify-center lg:gap-5 lg:pt-4 lg:pb-6">
         <span className="rounded-full bg-[#3B2417] px-4 py-1.5 font-sans text-[0.6875rem] uppercase tracking-[0.18em] text-[#F5EDE3]">
           Special
         </span>
