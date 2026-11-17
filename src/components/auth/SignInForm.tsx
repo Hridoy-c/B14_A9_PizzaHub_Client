@@ -15,13 +15,19 @@ import {
 const SignInForm = () => {
   const [showPassword, setShowPassword] = useState(false);
 
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const name = String(formData.get("name") ?? "").trim();
+    const email = String(formData.get("email") ?? "").trim();
+
+    console.log("submit values:", { name, email });
+  };
+
   return (
     <div className="flex flex-col gap-5">
-      <form
-        className="flex flex-col gap-4"
-        onSubmit={(event) => event.preventDefault()}
-        noValidate
-      >
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit} noValidate>
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="signin-email" className={labelClass}>
             Email

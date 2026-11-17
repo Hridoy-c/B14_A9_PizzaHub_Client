@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Check, Minus } from "lucide-react";
+import { passwordRules } from "./password-rules";
 
 type PasswordRequirementsProps = {
   value: string;
@@ -13,23 +14,10 @@ const PasswordRequirements = ({
   value,
   compact = false,
 }: PasswordRequirementsProps) => {
-  const rules = [
-    {
-      label: "Minimum 6 characters",
-      short: "6+ characters",
-      passed: value.length >= 6,
-    },
-    {
-      label: "At least one uppercase letter",
-      short: "1 uppercase",
-      passed: /[A-Z]/.test(value),
-    },
-    {
-      label: "At least one lowercase letter",
-      short: "1 lowercase",
-      passed: /[a-z]/.test(value),
-    },
-  ];
+  const rules = passwordRules.map((rule) => ({
+    ...rule,
+    passed: rule.test(value),
+  }));
 
   if (compact) {
     return (

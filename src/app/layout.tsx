@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 
+import Toaster from "@/components/ui/sonner";
+
 
 const domaine = localFont({
   src: "../assets/fonts/domaine-display-condensed-medium.ttf",
@@ -33,10 +35,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${domaine.variable} ${generalSans.variable} ${robotoFlex.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-[#F5EDE3] font-body text-[#2A1A10]">
         {children}
+        <Toaster />
       </body>
     </html>
   );
