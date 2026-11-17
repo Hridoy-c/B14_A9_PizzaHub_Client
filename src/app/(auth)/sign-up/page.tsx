@@ -14,6 +14,7 @@ export default function SignUpPage() {
     <AuthCard
       title="Create your account"
       subtitle="Join PizzaHub to order, track and enjoy fresh pizza."
+      maxWidthClass="max-w-[560px]"
       footer={
         <>
           Already have an account?{" "}

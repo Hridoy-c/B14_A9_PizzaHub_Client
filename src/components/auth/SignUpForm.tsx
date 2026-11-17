@@ -14,9 +14,9 @@ import {
 } from "./field-styles";
 
 const roles = [
-  { value: "customer", label: "Customer", hint: "I order pizza for myself" },
-  { value: "vendor", label: "Vendor", hint: "I sell pizza on PizzaHub" },
-  { value: "admin", label: "Admin", hint: "I manage the platform" },
+  { value: "customer", label: "Customer", hint: "I order pizza" },
+  { value: "vendor", label: "Vendor", hint: "I sell pizza" },
+  { value: "admin", label: "Admin", hint: "I run the site" },
 ] as const;
 
 type Role = (typeof roles)[number]["value"];
@@ -28,13 +28,13 @@ const SignUpForm = () => {
   const [role, setRole] = useState<Role>("customer");
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-2.5">
       <form
-        className="flex flex-col gap-4"
+        className="flex flex-col gap-2.5"
         onSubmit={(event) => event.preventDefault()}
         noValidate
       >
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1.5">
           <span className={labelClass}>I am a</span>
 
           <div
@@ -52,7 +52,7 @@ const SignUpForm = () => {
                   role="radio"
                   aria-checked={selected}
                   onClick={() => setRole(item.value)}
-                  className={`flex flex-col items-center gap-1 rounded-xl border px-2 py-3 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B9733A]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#FBF6EF] ${
+                  className={`flex flex-col items-center gap-0.5 rounded-xl border px-2 py-2 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B9733A]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#FBF6EF] ${
                     selected
                       ? "border-[#3B2417] bg-[#3B2417] shadow-[0_10px_24px_-12px_rgba(59,36,23,0.75)]"
                       : "border-[#EADBC8] bg-white hover:border-[#B9733A]/60 hover:bg-[#F5EDE3]"
@@ -66,7 +66,7 @@ const SignUpForm = () => {
                     {item.label}
                   </span>
                   <span
-                    className={`text-[0.6875rem] leading-snug ${
+                    className={`text-[0.6875rem] leading-tight ${
                       selected ? "text-[#F5EDE3]/70" : "text-[#7A6455]"
                     }`}
                   >
@@ -80,37 +80,39 @@ const SignUpForm = () => {
           <input type="hidden" name="role" value={role} />
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="signup-name" className={labelClass}>
-            Full name
-          </Label>
-          <div className="relative">
-            <User className={`${iconClass} left-3`} aria-hidden="true" />
-            <Input
-              id="signup-name"
-              name="name"
-              type="text"
-              autoComplete="name"
-              placeholder="Rahim Uddin"
-              className={iconInputClass}
-            />
+        <div className="grid gap-2.5 sm:grid-cols-2">
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="signup-name" className={labelClass}>
+              Full name
+            </Label>
+            <div className="relative">
+              <User className={`${iconClass} left-3`} aria-hidden="true" />
+              <Input
+                id="signup-name"
+                name="name"
+                type="text"
+                autoComplete="name"
+                placeholder="Rahim Uddin"
+                className={iconInputClass}
+              />
+            </div>
           </div>
-        </div>
 
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="signup-email" className={labelClass}>
-            Email
-          </Label>
-          <div className="relative">
-            <Mail className={`${iconClass} left-3`} aria-hidden="true" />
-            <Input
-              id="signup-email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              placeholder="you@example.com"
-              className={iconInputClass}
-            />
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="signup-email" className={labelClass}>
+              Email
+            </Label>
+            <div className="relative">
+              <Mail className={`${iconClass} left-3`} aria-hidden="true" />
+              <Input
+                id="signup-email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                placeholder="you@example.com"
+                className={iconInputClass}
+              />
+            </div>
           </div>
         </div>
 
@@ -143,7 +145,7 @@ const SignUpForm = () => {
               )}
             </button>
           </div>
-          <PasswordRequirements value={password} />
+          <PasswordRequirements value={password} compact />
         </div>
 
         <div className="flex flex-col gap-1.5">
@@ -152,10 +154,10 @@ const SignUpForm = () => {
           </Label>
           <label
             htmlFor="signup-image"
-            className="flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-[#EADBC8] bg-white p-3 transition-colors hover:border-[#B9733A]"
+            className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-dashed border-[#EADBC8] bg-white px-2.5 py-1.5 transition-colors hover:border-[#B9733A]"
           >
-            <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[#F5EDE3] text-[#B9733A]">
-              <Camera className="size-5" aria-hidden="true" />
+            <span className="grid size-8 shrink-0 place-items-center rounded-full bg-[#F5EDE3] text-[#B9733A]">
+              <Camera className="size-4" aria-hidden="true" />
             </span>
             <span className="flex min-w-0 flex-col">
               <span className="truncate text-[0.8125rem] font-medium text-[#3B2417]">
@@ -178,7 +180,7 @@ const SignUpForm = () => {
           </label>
         </div>
 
-        <button type="submit" className={`${submitClass} mt-1`}>
+        <button type="submit" className={submitClass}>
           Create account
         </button>
       </form>

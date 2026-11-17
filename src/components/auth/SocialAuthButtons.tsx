@@ -33,11 +33,11 @@ const GitHubIcon = () => (
 );
 
 const buttonClass =
-  "inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-[#EADBC8] bg-white px-3 text-[0.8125rem] font-medium text-[#3B2417] shadow-sm transition-all hover:-translate-y-0.5 hover:bg-[#F5EDE3] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B9733A]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#FBF6EF]";
+  "inline-flex h-9 items-center justify-center gap-2 rounded-xl border border-[#EADBC8] bg-white px-3 text-[0.8125rem] font-medium text-[#3B2417] shadow-sm transition-all hover:-translate-y-0.5 hover:bg-[#F5EDE3] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B9733A]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#FBF6EF]";
 
 const SocialAuthButtons = () => {
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-3">
       <div className="flex items-center gap-3 text-[0.6875rem] uppercase tracking-[0.18em] text-[#A08C7B]">
         <span className="h-px flex-1 bg-[#EADBC8]" />
         Or continue with

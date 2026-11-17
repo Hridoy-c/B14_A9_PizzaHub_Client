@@ -2,7 +2,7 @@ export const labelClass =
   "text-[0.8125rem] font-medium text-[#3B2417]";
 
 export const inputClass =
-  "h-11 rounded-xl border-[#EADBC8] bg-white px-3.5 text-[0.9375rem] text-[#3B2417] placeholder:text-[#A08C7B] focus-visible:border-[#B9733A] focus-visible:ring-3 focus-visible:ring-[#B9733A]/25";
+  "h-10 rounded-xl border-[#EADBC8] bg-white px-3.5 text-[0.9375rem] text-[#3B2417] placeholder:text-[#A08C7B] focus-visible:border-[#B9733A] focus-visible:ring-3 focus-visible:ring-[#B9733A]/25";
 
 export const iconInputClass = `${inputClass} pl-10`;
 

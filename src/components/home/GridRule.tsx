@@ -1,4 +1,5 @@
 import React from 'react'
+import { cn } from 'cn'
 
 type GridRuleProps = {
   /** Number of columns between the vertical rules. */
@@ -15,7 +16,10 @@ const GridRule = ({ columns = 6, className = '' }: GridRuleProps) => {
   return (
     <div
       aria-hidden="true"
-      className={`flex h-16 w-full divide-x divide-[#EADBC8] md:h-24 ${className}`}
+      className={cn(
+        'flex h-16 w-full divide-x divide-[#EADBC8] md:h-24',
+        className,
+      )}
     >
       {Array.from({ length: columns }).map((_, index) => (
         <div key={index} className="flex-1" />
