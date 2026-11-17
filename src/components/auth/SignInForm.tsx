@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import SocialAuthButtons from "./SocialAuthButtons";
@@ -11,18 +13,79 @@ import {
   labelClass,
   submitClass,
 } from "./field-styles";
+import { authClient } from "@/lib/auth-client";
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const SignInForm = () => {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const form = event.currentTarget;
-    const formData = new FormData(form);
-    const name = String(formData.get("name") ?? "").trim();
-    const email = String(formData.get("email") ?? "").trim();
 
-    console.log("submit values:", { name, email });
+    const formData = new FormData(event.currentTarget);
+    const email = String(formData.get("email") ?? "").trim();
+    const password = String(formData.get("password") ?? "");
+
+    if (!email) {
+      toast.error("Email is required", {
+        description: "Enter the email you signed up with.",
+      });
+      return;
+    }
+
+    if (!EMAIL_PATTERN.test(email)) {
+      toast.error("That email does not look right", {
+        description: "Use a valid address like you@example.com.",
+      });
+      return;
+    }
+
+    if (!password) {
+      toast.error("Password is required", {
+        description: "Enter the password for your account.",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    const loadingToast = toast.loading("Signing you in…");
+
+    try {
+      const { data, error: signInError } = await authClient.signIn.email({
+        email,
+        password,
+      });
+
+      toast.dismiss(loadingToast);
+
+      if (signInError) {
+        toast.error("Could not sign you in", {
+          description: signInError.message ?? "Invalid email or password.",
+        });
+        return;
+      }
+
+      const firstName = data?.user?.name?.split(" ")[0];
+      const name = firstName || data?.user?.name;
+
+      toast.success(name ? `Welcome back, ${name}!` : "Welcome back!", {
+        description: "You are signed in. Taking you to the menu…",
+        duration: 4000,
+      });
+
+      router.push("/");
+      router.refresh();
+    } catch {
+      toast.dismiss(loadingToast);
+      toast.error("Something went wrong", {
+        description: "We could not reach the server. Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -40,6 +103,7 @@ const SignInForm = () => {
               type="email"
               autoComplete="email"
               placeholder="you@example.com"
+              disabled={isSubmitting}
               className={iconInputClass}
             />
           </div>
@@ -65,6 +129,7 @@ const SignInForm = () => {
               type={showPassword ? "text" : "password"}
               autoComplete="current-password"
               placeholder="••••••••"
+              disabled={isSubmitting}
               className={`${iconInputClass} pr-11`}
             />
             <button
@@ -82,8 +147,20 @@ const SignInForm = () => {
           </div>
         </div>
 
-        <button type="submit" className={`${submitClass} mt-1`}>
-          Sign in
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          aria-busy={isSubmitting}
+          className={`${submitClass} mt-1 gap-2 disabled:cursor-not-allowed disabled:opacity-60`}
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+              Signing in…
+            </>
+          ) : (
+            "Sign in"
+          )}
         </button>
       </form>
 

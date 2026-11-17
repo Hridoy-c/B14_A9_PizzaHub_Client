@@ -121,6 +121,8 @@ const SignUpForm = () => {
         },
       });
 
+      router.push("/");
+
       form.reset();
       setPassword("");
       resetImage();
