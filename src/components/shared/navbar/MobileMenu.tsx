@@ -1,107 +1,139 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
+import { LayoutDashboard, Loader2, LogOut, Menu, Settings } from 'lucide-react'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet'
 import Logo from './Logo'
+import { UserAvatar } from './UserMenu'
+import { NAV_LINKS, NavUser } from './Config'
+import { useLogout } from './UseLogout'
 
-type IconButtonProps = {
-  label: string
-  onClick: () => void
-  children: React.ReactNode
-  className?: string
-}
 
-const IconButton = ({ label, onClick, children, className = '' }: IconButtonProps) => {
-  return (
-    <button
-      type="button"
-      aria-label={label}
-      onClick={onClick}
-      className={`inline-flex h-10 w-10 items-center justify-center rounded-md text-[#3B2417] transition-colors hover:bg-[#EADBC8] hover:text-[#B9733A] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#B9733A] ${className}`}
-    >
-      {children}
-    </button>
-  )
-}
+const linkClass =
+  'flex items-center gap-3 rounded-md px-2 py-2.5 text-[1.2rem] text-[#EADBC8] transition-colors hover:bg-[#2A1A10] hover:text-[#B9733A]'
 
-const MobileMenu = () => {
+const MobileMenu = ({ user }: { user: NavUser | null }) => {
   const [open, setOpen] = useState(false)
-
-  useEffect(() => {
-    if (!open) return
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
-    document.addEventListener('keydown', onKey)
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.removeEventListener('keydown', onKey)
-      document.body.style.overflow = ''
-    }
-  }, [open])
-
+  const { logout, isPending } = useLogout()
   const close = () => setOpen(false)
+
+  const handleLogout = async () => {
+    close()
+    await logout()
+  }
 
   return (
     <div className="md:hidden">
-      <IconButton label="Open menu" onClick={() => setOpen(true)}>
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-          <path d="M4 7h16M4 12h16M4 17h16" />
-        </svg>
-      </IconButton>
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetTrigger
+          render={
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Open menu"
+              className="size-10 text-[#3B2417] hover:bg-[#EADBC8] hover:text-[#B9733A]"
+            />
+          }
+        >
+          <Menu className="size-6" />
+        </SheetTrigger>
 
-      {/* Overlay */}
-      <div
-        onClick={close}
-        className={`fixed inset-0 z-40 bg-[#2A1A10]/60 transition-opacity duration-300 ${
-          open ? 'opacity-100' : 'pointer-events-none opacity-0'
-        }`}
-      />
+        <SheetContent
+          side="right"
+          className="flex w-[80vw] max-w-sm flex-col gap-0 border-l-0 bg-[#3B2417] p-0 font-sans text-[#EADBC8] [&>button]:text-[#F5EDE3] [&>button]:hover:bg-[#2A1A10]"
+        >
+          <SheetHeader className="px-6 pb-0 pt-5 text-left">
+            <SheetTitle className="sr-only">Menu</SheetTitle>
+            <SheetDescription className="sr-only">Site navigation</SheetDescription>
+            <Logo tone="light" onClick={close} />
+          </SheetHeader>
 
-      {/* Right sidebar */}
-      <aside
-        aria-hidden={!open}
-        className={`fixed right-0 top-0 z-50 flex h-full w-[75vw] max-w-sm flex-col bg-[#3B2417] px-6 py-5 font-sans shadow-2xl transition-transform duration-300 ${
-          open ? 'translate-x-0' : 'translate-x-full'
-        }`}
-      >
-        <div className="flex items-center justify-between">
-          <Logo tone="light" onClick={close} />
-          <IconButton
-            label="Close menu"
-            onClick={close}
-            className="!text-[#F5EDE3] hover:!bg-[#2A1A10]"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <path d="M6 6l12 12M18 6L6 18" />
-            </svg>
-          </IconButton>
-        </div>
+          {user && (
+            <div className="mx-6 mt-8 flex items-center gap-3 rounded-xl bg-[#2A1A10] p-3">
+              <UserAvatar user={user} className="size-11" />
+              <div className="min-w-0">
+                <p className="truncate font-semibold text-[#F5EDE3]">{user.name}</p>
+                <p className="truncate text-xs text-[#EADBC8]/70">{user.email}</p>
+              </div>
+            </div>
+          )}
 
-        <nav className="mt-10 flex flex-col gap-5 text-[clamp(1.35rem,1.1rem+2vw,1.65rem)]">
-          <Link href="/" onClick={close} className="text-[#EADBC8] transition-colors hover:text-[#B9733A]">
-            Home
-          </Link>
-          <Link href="/menu" onClick={close} className="text-[#EADBC8] transition-colors hover:text-[#B9733A]">
-            Browse Menu
-          </Link>
-        </nav>
+          <nav className={`flex flex-col gap-1 px-4 ${user ? 'mt-4' : 'mt-8'}`}>
+            {NAV_LINKS.map((l: { href: string; label: string }) => (
+              <Link key={l.href} href={l.href} onClick={close} className={linkClass}>
+                {l.label}
+              </Link>
+            ))}
 
-        <div className="mt-auto flex flex-col gap-3 pb-4 text-[1rem]">
-          <Link
-            href="/sign-in"
-            onClick={close}
-            className="rounded-full border border-[#EADBC8] py-2.5 text-center text-[#EADBC8] transition-colors hover:bg-[#EADBC8] hover:text-[#2A1A10]"
-          >
-            Sign In
-          </Link>
-          <Link
-            href="/sign-up"
-            onClick={close}
-            className="rounded-full bg-[#B9733A] py-2.5 text-center text-[#F5EDE3] transition-colors hover:bg-[#F5EDE3] hover:text-[#2A1A10]"
-          >
-            Sign Up
-          </Link>
-        </div>
-      </aside>
+            {user && (
+              <>
+                <Separator className="my-2 bg-[#EADBC8]/15" />
+                <Link href="/dashboard" onClick={close} className={linkClass}>
+                  <LayoutDashboard className="size-5" /> Dashboard
+                </Link>
+                <Link href="/profile" onClick={close} className={linkClass}>
+                  <Settings className="size-5" /> Profile Settings
+                </Link>
+              </>
+            )}
+          </nav>
+
+          {user ? (
+            <div className="mt-auto px-4 pb-6 pt-4">
+              <Separator className="mb-3 bg-[#EADBC8]/15" />
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={handleLogout}
+                disabled={isPending}
+                aria-busy={isPending}
+                className="h-11 w-full justify-start gap-3 rounded-full px-2.5 text-[1rem] text-[#EADBC8] hover:bg-[#2A1A10] hover:text-[#F5EDE3] disabled:opacity-60"
+              >
+                {isPending ? (
+                  <Loader2 className="size-5 animate-spin" aria-hidden="true" />
+                ) : (
+                  <LogOut className="size-5" aria-hidden="true" />
+                )}
+                {isPending ? 'Signing out…' : 'Logout'}
+              </Button>
+            </div>
+          ) : (
+            <div className="mt-auto flex flex-col gap-3 px-6 pb-6">
+              <Link
+                href="/sign-in"
+                onClick={close}
+                className={buttonVariants({
+                  variant: 'outline',
+                  className:
+                    'h-11 rounded-full border-[#EADBC8] bg-transparent text-[1rem] text-[#EADBC8] hover:bg-[#EADBC8] hover:text-[#2A1A10]',
+                })}
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/sign-up"
+                onClick={close}
+                className={buttonVariants({
+                  className:
+                    'h-11 rounded-full bg-[#B9733A] text-[1rem] text-[#F5EDE3] hover:bg-[#F5EDE3] hover:text-[#2A1A10]',
+                })}
+              >
+                Sign Up
+              </Link>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   )
 }
