@@ -1,14 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
 import mainPizza from "../../assets/images/pizza-hero.png";
+import sliceLeft from "../../assets/images/pizza-slice-left.png";
+import sliceRight from "../../assets/images/pizza-slice-right.png";
 
 const badgeClass =
   "absolute z-30 hidden rounded-xl border border-[#EADBC8] bg-white px-3 py-2 font-sans text-[0.75rem] text-[#3B2417] shadow-md md:block";
 
+const sideSliceClass =
+  "pointer-events-none absolute top-1/2 hidden -translate-y-1/2 select-none drop-shadow-[0_26px_30px_rgba(42,26,16,0.28)] lg:block";
+
 export default function HeroBanner() {
   return (
     <section className="relative isolate w-full overflow-hidden">
-      <div className="mx-auto flex w-[90vw] max-w-[1200px] flex-col items-center gap-8 pt-10 pb-14 md:gap-10 md:pt-14 md:pb-20 lg:min-h-[calc(100svh-4.25rem)] lg:justify-center lg:gap-5 lg:pt-4 lg:pb-6">
+      <div className="relative z-10 mx-auto flex w-[90vw] max-w-[1200px] flex-col items-center gap-8 pt-10 pb-14 md:gap-10 md:pt-14 md:pb-20 lg:min-h-[calc(100svh-4.25rem)] lg:justify-center lg:gap-5 lg:pt-4 lg:pb-6">
         <span className="rounded-full bg-[#3B2417] px-4 py-1.5 font-sans text-[0.6875rem] uppercase tracking-[0.18em] text-[#F5EDE3]">
           Special
         </span>
@@ -37,6 +42,27 @@ export default function HeroBanner() {
           <span className={`${badgeClass} -right-4 top-1/3`}>
             🧀 Extra cheese
           </span>
+
+          {/* Decorative slices flanking the centre pizza; they track the pizza's
+              box, so they stay aligned as the layout scales. Desktop only. */}
+          <Image
+            src={sliceLeft}
+            alt=""
+            aria-hidden="true"
+            width={440}
+            height={457}
+            sizes="190px"
+            className={`${sideSliceClass} right-full mr-4 w-[150px] -rotate-[6deg] xl:mr-10 xl:w-[190px]`}
+          />
+          <Image
+            src={sliceRight}
+            alt=""
+            aria-hidden="true"
+            width={403}
+            height={595}
+            sizes="170px"
+            className={`${sideSliceClass} left-full ml-4 w-[140px] rotate-[5deg] scale-x-[-1] xl:ml-10 xl:w-[175px]`}
+          />
         </div>
 
         <p className="max-w-[46ch] text-center text-[0.9375rem] leading-relaxed text-[#7A6455]">
