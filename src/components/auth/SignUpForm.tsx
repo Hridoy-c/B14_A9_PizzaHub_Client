@@ -20,7 +20,6 @@ import { authClient } from "@/lib/auth-client";
 const roles = [
   { value: "customer", label: "Customer", hint: "I order pizza" },
   { value: "vendor", label: "Vendor", hint: "I sell pizza" },
-  { value: "admin", label: "Admin", hint: "I run the site" },
 ] as const;
 
 type Role = (typeof roles)[number]["value"];
@@ -217,7 +216,7 @@ const SignUpForm = () => {
           <div
             role="radiogroup"
             aria-label="Account role"
-            className="grid grid-cols-3 gap-2"
+            className="grid grid-cols-2 gap-2"
           >
             {roles.map((item) => {
               const selected = role === item.value;
