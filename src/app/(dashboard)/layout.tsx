@@ -1,7 +1,8 @@
 import React from 'react'
-import Logo from '@/components/shared/navbar/Logo'
 import GridRule from '@/components/home/GridRule'
 import { requireUser } from '@/lib/cors/Session'
+import DashboardSidebar from '@/components/dashboard/DashboardSidebar'
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 
 // The dashboard header shows the signed-in user, so it blocks on the session read.
 export const instant = false
@@ -11,26 +12,33 @@ const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
   const user = await requireUser()
 
   return (
-    <div className="flex min-h-svh flex-col bg-[#F5EDE3]">
-      <header className="mx-auto flex w-[90vw] max-w-[1200px] items-center justify-between gap-4 py-5">
-        <Logo />
+    <SidebarProvider>
+      <DashboardSidebar
+        user={{
+          name: user.name,
+          email: user.email,
+          role: user.role as string | null | undefined,
+        }}
+      />
 
-        <div className="min-w-0 text-right font-sans">
-          <p className="text-[0.6875rem] uppercase tracking-[0.14em] text-[#7A6455]">
-            Signed in as
+      <div className="flex min-h-svh flex-1 flex-col bg-[#F5EDE3]">
+        <header className="flex h-14 items-center gap-3 border-b border-[#EADBC8] px-4 font-sans sm:px-6">
+          <SidebarTrigger className="-ml-1 text-[#3B2417] hover:bg-[#3B2417]/5 md:hidden" />
+          <p className="truncate text-[0.875rem] text-[#7A6455]">
+            Signed in as{' '}
+            <span className="text-[#3B2417]">{user.name}</span>
           </p>
-          <p className="truncate text-[0.9375rem] text-[#3B2417]">{user.name}</p>
-        </div>
-      </header>
+        </header>
 
-      <GridRule className="h-10 md:h-14" />
+        <GridRule className="h-10 md:h-14" />
 
-      <main className="mx-auto w-[90vw] max-w-[1200px] flex-1 py-8 font-sans">
-        {children}
-      </main>
+        <main className="mx-auto w-full max-w-[1200px] flex-1 px-5 py-8 font-sans sm:px-8">
+          {children}
+        </main>
 
-      <GridRule className="h-10 md:h-14" />
-    </div>
+        <GridRule className="h-10 md:h-14" />
+      </div>
+    </SidebarProvider>
   )
 }
 

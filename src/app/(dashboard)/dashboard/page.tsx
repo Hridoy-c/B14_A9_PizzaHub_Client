@@ -1,13 +1,13 @@
-import React from 'react'
+import { redirect } from "next/navigation";
+import { requireUser } from "@/lib/cors/Session";
+import { dashboardHome } from "@/lib/roles";
 
-const DeshBoardPage = () => {
-  return (
-    <div>
-      <h1 className="font-display text-[clamp(1.75rem,1.4rem+1vw,2.5rem)] leading-none tracking-tight text-[#3B2417]">
-        Dashboard
-      </h1>
-    </div>
-  )
-}
+// Reads the session, so it blocks rather than prerendering.
+export const instant = false;
 
-export default DeshBoardPage
+const DashboardIndexPage = async () => {
+  const user = await requireUser();
+  redirect(dashboardHome(user.role));
+};
+
+export default DashboardIndexPage;
