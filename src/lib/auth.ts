@@ -6,6 +6,17 @@ const client = new MongoClient(process.env.MONGODB_URI || "");
 const db = client.db("Pizza_hub");
 
 export const auth = betterAuth({
+  baseURL: process.env.BETTER_AUTH_URL, 
+    socialProviders: {
+        google: { 
+            clientId: process.env.GOOGLE_CLIENT_ID as string, 
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET as string, 
+        }, 
+        github: { 
+            clientId: process.env.GITHUB_CLIENT_ID as string, 
+            clientSecret: process.env.GITHUB_CLIENT_SECRET as string, 
+        },
+    },
   emailAndPassword: {
     enabled: true,
     // Matches the form's "Minimum 6 characters" rule.
@@ -22,6 +33,7 @@ export const auth = betterAuth({
       },
     },
   },
+
   database: mongodbAdapter(db, {
     client,
   }),
