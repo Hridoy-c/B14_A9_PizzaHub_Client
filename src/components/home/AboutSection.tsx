@@ -1,77 +1,15 @@
 import React from "react";
+import Image from "next/image";
 import GridRule from "./GridRule";
-
-/* ---------- Inline illustrations (swap for real photos any time) ---------- */
-
-const PizzaSliceArt = ({ className = "" }: { className?: string }) => (
-  <svg
-    viewBox="0 0 80 80"
-    aria-hidden="true"
-    focusable="false"
-    className={className}
-    fill="none"
-    strokeLinejoin="round"
-    strokeLinecap="round"
-  >
-    <g transform="rotate(-10 40 40)">
-      {/* cheese */}
-      <path
-        d="M40 5 73 65Q40 76 7 65Z"
-        fill="#F2C14E"
-        stroke="#3B2417"
-        strokeWidth="2.5"
-      />
-      {/* crust */}
-      <path
-        d="M7 65Q40 76 73 65L70 58Q40 67 10 58Z"
-        fill="#B9733A"
-        stroke="#3B2417"
-        strokeWidth="2.5"
-      />
-      {/* pepperoni */}
-      <circle cx="40" cy="22" r="5.5" fill="#B23B2E" stroke="#3B2417" strokeWidth="2" />
-      <circle cx="30" cy="42" r="6" fill="#B23B2E" stroke="#3B2417" strokeWidth="2" />
-      <circle cx="49" cy="44" r="5.5" fill="#B23B2E" stroke="#3B2417" strokeWidth="2" />
-      {/* basil */}
-      <path
-        d="M38 52c4-6 10-6 13-3-2 6-9 8-13 3Z"
-        fill="#5B7F3A"
-        stroke="#3B2417"
-        strokeWidth="1.8"
-      />
-    </g>
-  </svg>
-);
-
-const TomatoArt = ({ className = "" }: { className?: string }) => (
-  <svg
-    viewBox="0 0 48 48"
-    aria-hidden="true"
-    focusable="false"
-    className={className}
-    fill="none"
-    strokeLinejoin="round"
-    strokeLinecap="round"
-  >
-    <circle cx="24" cy="27" r="17" fill="#D64532" stroke="#3B2417" strokeWidth="2.5" />
-    <path d="M15 22c1.5-3.5 4.5-5.5 8-5.8" stroke="#F5EDE3" strokeWidth="2.5" opacity=".7" />
-    <path
-      d="M24 11 28 6l-1 8 7-2-5 6-5-2-5 2-5-6 7 2-1-8Z"
-      fill="#5B7F3A"
-      stroke="#3B2417"
-      strokeWidth="2"
-    />
-  </svg>
-);
 
 /* ---------- Inline media helpers (sized in em so they scale with the text) ---------- */
 
 const PillMedia = ({ children }: { children: React.ReactNode }) => (
   <span
     aria-hidden="true"
-    className="relative mx-[0.1em] inline-block h-[0.8em] w-[1.7em] rounded-full bg-white align-[-0.06em]"
+    className="relative mx-[0.12em] inline-block h-[1em] w-[1.9em] rounded-full bg-white align-[-0.16em]"
   >
-    <span className="pointer-events-none absolute bottom-[0.02em] left-1/2 block h-[1.5em] w-[1.5em] -translate-x-1/2">
+    <span className="pointer-events-none absolute left-1/2 top-1/2 block h-[0.82em] w-[0.82em] -translate-x-1/2 -translate-y-1/2">
       {children}
     </span>
   </span>
@@ -97,10 +35,24 @@ const AboutSection = () => {
         >
           At PizzaHub, we believe pizza{" "}
           <PillMedia>
-            <PizzaSliceArt className="size-full drop-shadow-[0_6px_6px_rgba(42,26,16,0.25)]" />
+            <Image
+              src="/images/about/slice.webp"
+              alt=""
+              width={256}
+              height={256}
+              sizes="160px"
+              className="size-full rounded-full object-cover drop-shadow-[0_6px_6px_rgba(42,26,16,0.28)]"
+            />
           </PillMedia>{" "}
           is more than a meal — it’s an experience. Sourcing{" "}
-          <TomatoArt className="mx-[0.05em] inline-block h-[0.9em] w-[0.9em] align-[-0.1em]" />{" "}
+          <Image
+            src="/images/about/fresh-tomato.webp"
+            alt=""
+            width={256}
+            height={256}
+            sizes="96px"
+            className="mx-[0.05em] inline-block h-[0.9em] w-[0.9em] rounded-full object-cover align-[-0.1em]"
+          />{" "}
           fresh ingredients to perfecting every slice
         </h2>
       </div>

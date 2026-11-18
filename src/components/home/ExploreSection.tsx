@@ -1,15 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { ArrowRight, Star } from "lucide-react";
+import PizzaCard from "@/components/home/PizzaCard";
 import {
   exploreCategories,
   explorePizzas,
   type ExploreCategory,
 } from "@/components/home/Explore-data";
-
 
 const ExploreSection = () => {
   const [active, setActive] = useState<ExploreCategory>(exploreCategories[0]);
@@ -65,46 +62,8 @@ const ExploreSection = () => {
 
         {/* Cards */}
         <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((pizza) => (
-            <li
-              key={pizza.id}
-              className="group relative flex flex-col rounded-3xl bg-[#F8EDDC] p-5 transition-shadow hover:shadow-[0_20px_40px_-24px_rgba(59,36,23,0.5)]"
-            >
-              <span className="flex items-center justify-end gap-1 font-display text-[0.9375rem] text-[#7A2E12]">
-                {pizza.rating.toFixed(1)}
-                <Star
-                  className="size-4 fill-[#F2813B] text-[#F2813B]"
-                  aria-hidden="true"
-                />
-              </span>
-
-              <div className="relative mx-auto mt-2 aspect-square w-full max-w-[260px]">
-                <Image
-                  src={pizza.image}
-                  alt={pizza.name}
-                  fill
-                  sizes="(min-width: 1024px) 260px, (min-width: 640px) 40vw, 80vw"
-                  className="object-contain drop-shadow-[0_16px_14px_rgba(42,26,16,0.25)] transition-transform duration-300 group-hover:scale-105"
-                />
-              </div>
-
-              <h3 className="mt-4 text-center font-display text-[1.5rem] uppercase leading-none text-[#7A2E12]">
-                {pizza.name}
-              </h3>
-
-              <div className="mt-6 flex items-center justify-between">
-                <span className="font-display text-[1.375rem] text-[#7A2E12]">
-                  ${pizza.price.toFixed(2)}
-                </span>
-                <Link
-                  href="/menu"
-                  className="inline-flex items-center gap-1 font-display text-[0.9375rem] uppercase text-[#F2813B] transition-colors hover:text-[#7A2E12]"
-                >
-                  Order this pizza
-                  <ArrowRight className="size-3.5" aria-hidden="true" />
-                </Link>
-              </div>
-            </li>
+          {items.map((pizza, index) => (
+            <PizzaCard key={pizza.id} pizza={pizza} priority={index < 3} />
           ))}
         </ul>
       </div>
