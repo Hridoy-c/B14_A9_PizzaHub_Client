@@ -1,20 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Check, ImagePlus, Loader2, MapPin } from "lucide-react";
 import ImageUploader from "./ImageUploader";
+import { createPizzaPost } from "@/lib/actions/pizza";
+import {
+  PIZZA_CATEGORIES,
+  type AddItemPayload,
+  type PizzaCategory,
+} from "@/lib/types/menu-item";
 
 /* ---------- Config ---------- */
-
-const PIZZA_CATEGORIES = [
-  { value: "classic", label: "Classic Pizzas" },
-  { value: "vegetarian", label: "Vegetarian Pizzas" },
-  { value: "meat-lovers", label: "Meat Lovers" },
-  { value: "specialty", label: "Specialty / Gourmet Pizzas" },
-  { value: "sides", label: "Sides & Appetizers" },
-  { value: "beverages-desserts", label: "Beverages & Desserts" },
-] as const;
 
 const MAX_DESCRIPTION = 400;
 
@@ -58,8 +56,10 @@ const Field = ({
 /* ---------- Form ---------- */
 
 const AddItemForm = () => {
+  const router = useRouter();
+
   const [name, setName] = useState("");
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState<PizzaCategory | "">("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [location, setLocation] = useState("");
@@ -117,9 +117,9 @@ const AddItemForm = () => {
       });
     }
 
-    const postData = {
+    const postData: AddItemPayload = {
       name: cleanName,
-      category,
+      category, // narrowed to PizzaCategory by the check above
       description: cleanDescription,
       price: priceNumber,
       location: cleanLocation,
@@ -128,15 +128,25 @@ const AddItemForm = () => {
     };
 
     setIsSubmitting(true);
+    const loadingToast = toast.loading("Creating menu item…");
 
     try {
-      // TODO: এখানে আপনার API fetch করুন, payload পাঠান।
-      console.log('payload', {postData});
+      // await is required, otherwise errors are never caught here.
+      const res = await createPizzaPost(postData);
+      console.log(res);
 
-      // সফল হলে: toast.success(...), resetForm(), router.refresh() ইত্যাদি।
-    } catch {
+      toast.dismiss(loadingToast);
+      toast.success("Menu item created", {
+        description: `${cleanName} is now on the menu.`,
+      });
+
+      resetForm();
+      router.refresh();
+    } catch (error) {
+      toast.dismiss(loadingToast);
       toast.error("Something went wrong", {
-        description: "Please try again.",
+        description:
+          error instanceof Error ? error.message : "Please try again.",
       });
     } finally {
       setIsSubmitting(false);
