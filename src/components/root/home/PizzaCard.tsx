@@ -11,10 +11,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import type { ExplorePizza } from "@/components/root/home/Explore-data";
+import type { CardPizza } from "@/lib/types/menu-item";
 
 type PizzaCardProps = {
-  pizza: ExplorePizza;
+  pizza: CardPizza;
   /** Loads the photo eagerly (use for the first row above the fold). */
   priority?: boolean;
   sizes?: string;
@@ -61,23 +61,32 @@ const PizzaCard = ({
     >
       <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-[#EADBC8]">
         {media}
-        <span className="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-[#F5EDE3]/95 px-2.5 py-1 font-display text-[0.8125rem] leading-none text-[#7A2E12] shadow-sm">
-          {pizza.rating.toFixed(1)}
-          <Star className="size-3.5 fill-[#F2813B] text-[#F2813B]" aria-hidden="true" />
-        </span>
+        {typeof pizza.rating === "number" && (
+          <span className="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-[#F5EDE3]/95 px-2.5 py-1 font-display text-[0.8125rem] leading-none text-[#7A2E12] shadow-sm">
+            {pizza.rating.toFixed(1)}
+            <Star
+              className="size-3.5 fill-[#F2813B] text-[#F2813B]"
+              aria-hidden="true"
+            />
+          </span>
+        )}
       </div>
 
-      <p className="mt-4 font-sans text-[0.6875rem] uppercase tracking-[0.16em] text-[#B9733A]">
-        {pizza.category}
-      </p>
+      {pizza.category && (
+        <p className="mt-4 font-sans text-[0.6875rem] uppercase tracking-[0.16em] text-[#B9733A]">
+          {pizza.category}
+        </p>
+      )}
 
       <h3 className="mt-1 font-display text-[1.375rem] uppercase leading-none tracking-tight text-[#7A2E12]">
         {pizza.name}
       </h3>
 
-      <p className="mt-2 line-clamp-2 flex-1 font-body text-[0.8125rem] leading-relaxed text-[#7A6455]">
-        {pizza.description}
-      </p>
+      {pizza.description && (
+        <p className="mt-2 line-clamp-2 flex-1 font-body text-[0.8125rem] leading-relaxed text-[#7A6455]">
+          {pizza.description}
+        </p>
+      )}
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
         <span className="font-display text-[1.25rem] text-[#7A2E12]">
@@ -134,32 +143,40 @@ const PizzaCard = ({
             </div>
 
             <div className="flex flex-col gap-3 p-5 sm:p-6">
-              <p className="font-sans text-[0.6875rem] uppercase tracking-[0.16em] text-[#B9733A]">
-                {pizza.category}
-              </p>
+              {pizza.category && (
+                <p className="font-sans text-[0.6875rem] uppercase tracking-[0.16em] text-[#B9733A]">
+                  {pizza.category}
+                </p>
+              )}
 
               <DialogTitle className="font-display text-[1.75rem] uppercase leading-none tracking-tight text-[#7A2E12]">
                 {pizza.name}
               </DialogTitle>
 
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-sans text-[0.75rem] uppercase tracking-wide text-[#B9733A]">
-                <span className="inline-flex items-center gap-1">
-                  {pizza.rating.toFixed(1)}
-                  <Star
-                    className="size-3.5 fill-[#F2813B] text-[#F2813B]"
-                    aria-hidden="true"
-                  />
-                  rating
-                </span>
-                <span aria-hidden="true">•</span>
+                {typeof pizza.rating === "number" && (
+                  <>
+                    <span className="inline-flex items-center gap-1">
+                      {pizza.rating.toFixed(1)}
+                      <Star
+                        className="size-3.5 fill-[#F2813B] text-[#F2813B]"
+                        aria-hidden="true"
+                      />
+                      rating
+                    </span>
+                    <span aria-hidden="true">•</span>
+                  </>
+                )}
                 <span className="font-display text-[1.125rem] normal-case text-[#7A2E12]">
                   ${pizza.price.toFixed(2)}
                 </span>
               </div>
 
-              <DialogDescription className="font-body text-[0.9375rem] leading-relaxed text-[#7A6455]">
-                {pizza.description}
-              </DialogDescription>
+              {pizza.description && (
+                <DialogDescription className="font-body text-[0.9375rem] leading-relaxed text-[#7A6455]">
+                  {pizza.description}
+                </DialogDescription>
+              )}
 
               <Link
                 href="/menu"

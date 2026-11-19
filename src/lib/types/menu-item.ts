@@ -40,7 +40,24 @@ export type AddItemPayload = {
 /** What your server stores and returns. */
 export type MenuItem = AddItemPayload & {
   _id: string;
-  vendorId: string;
   createdAt: string;
   updatedAt: string;
+};
+
+/**
+ * The subset of a pizza that `PizzaCard` renders. Both database items
+ * (`MenuItem`, mapped in the menu page) and the static home cards
+ * (`ExplorePizza`) fit this shape.
+ */
+export type CardPizza = {
+  id: string;
+  name: string;
+  price: number;
+  image?: string;
+  /** Shown only when present — vendor items have no rating yet. */
+  rating?: number;
+  description?: string;
+  /** Display label, e.g. "Classic Pizzas". */
+  category?: string;
+  emoji?: string;
 };
