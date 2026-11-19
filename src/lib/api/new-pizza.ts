@@ -15,8 +15,22 @@ export const getPizzas = async (): Promise<MenuItem[]> => {
   }
 };
 
-export const getPizzasById = async (id: string) => {
-  const api = `${BASE_URL}/api/pizzas/${id}`;
-  const res = await fetch(api);
-  return res.json();
-}
+/** A single menu item, or `null` when the id does not exist. */
+export const getPizzasById = async (id: string): Promise<MenuItem | null> => {
+  try {
+    const res = await fetch(
+      `${BASE_URL}/api/pizzas/${encodeURIComponent(id)}`,
+      { cache: "no-store" },
+    );
+    if (!res.ok) return null;
+
+    const json = await res.json();
+    const item = json?.data ?? json;
+
+    if (!item || typeof item !== "object" || !item._id) return null;
+
+    return item as MenuItem;
+  } catch {
+    return null;
+  }
+};
