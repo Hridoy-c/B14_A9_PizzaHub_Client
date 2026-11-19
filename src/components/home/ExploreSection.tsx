@@ -8,10 +8,14 @@ import {
   type ExploreCategory,
 } from "@/components/home/Explore-data";
 
+const MAX_VISIBLE_ITEMS = 6;
+
 const ExploreSection = () => {
   const [active, setActive] = useState<ExploreCategory>(exploreCategories[0]);
 
-  const items = explorePizzas.filter((pizza) => pizza.category === active);
+  const items = explorePizzas
+    .filter((pizza) => pizza.category === active)
+    .slice(0, MAX_VISIBLE_ITEMS);
 
   return (
     <section
@@ -25,10 +29,11 @@ const ExploreSection = () => {
             id="explore-heading"
             className="max-w-[12ch] font-display text-[clamp(2.25rem,1.4rem+3.6vw,4.25rem)] uppercase leading-[0.95] tracking-tight text-[#7A2E12]"
           >
-            Explore our signature pizzas
+            Explore our menu
           </h2>
           <p className="max-w-[34ch] font-sans text-[0.8125rem] uppercase leading-snug tracking-wide text-[#B9733A]">
-            A selection of favorites crafted to delight every pizza lover.
+            Pizzas, sides, drinks and desserts — crafted to delight every pizza
+            lover.
           </p>
         </div>
 

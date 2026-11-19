@@ -9,7 +9,7 @@ import {
 export const metadata = {
   title: "Menu | PizzaHub",
   description:
-    "Every PizzaHub pizza — signature classics, meat lovers and veggie favourites, baked to order.",
+    "The full PizzaHub menu — classic and gourmet pizzas, vegetarian favourites, meat lovers, sides, drinks and desserts, baked to order.",
 };
 
 const MenuPage = () => {
@@ -26,7 +26,7 @@ const MenuPage = () => {
           </h1>
         </div>
         <p className="max-w-[38ch] font-body text-[0.9375rem] leading-relaxed text-[#7A6455]">
-          Eighteen pizzas, hand-stretched and stone-baked. Pick a favourite below
+          Stone-baked pizzas, sides, drinks and desserts. Pick a favourite below
           or jump straight to a section.
         </p>
       </header>
@@ -66,7 +66,7 @@ const MenuPage = () => {
                   {category}
                 </h2>
                 <span className="font-sans text-[0.75rem] uppercase tracking-wide text-[#B9733A]">
-                  {items.length} pizzas
+                  {items.length} {items.length === 1 ? "item" : "items"}
                 </span>
               </div>
 
