@@ -32,6 +32,12 @@ export const auth = betterAuth({
         input: true,
       },
     },
+    changeEmail: {
+      enabled: true,
+      // Email/password accounts are unverified, so let them switch address
+      // without an SMTP provider. Verified social accounts still need one.
+      updateEmailWithoutVerification: true,
+    },
   },
 
   database: mongodbAdapter(db, {
