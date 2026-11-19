@@ -1,12 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
+import { headers } from "next/headers";
 import { ImageOff, PlusCircle } from "lucide-react";
 import { requireUser } from "@/lib/cors/Session";
 import { categoryLabel } from "@/lib/utils/menu";
 import type { MenuItemStatus } from "@/lib/types";
-import { getMenuByVendor } from "@/lib/api/menu-item";
+import { getMyMenu } from "@/lib/api/menu-item";
 
-// Session পড়ে, তাই prerender হবে না।
+// Reads the session, so it blocks instead of prerendering.
 export const instant = false;
 
 const statusStyles: Record<MenuItemStatus, string> = {
@@ -18,7 +19,9 @@ const statusStyles: Record<MenuItemStatus, string> = {
 
 const VendorMenuPage = async () => {
   const user = await requireUser();
-  const items = await getMenuByVendor(user.id);
+  const cookie = (await headers()).get("cookie") ?? "";
+  // The vendor's own items in every state: pending, approved and rejected.
+  const items = await getMyMenu(cookie);
 
   return (
     <section className="flex flex-col gap-6">
@@ -81,23 +84,30 @@ const VendorMenuPage = async () => {
                 <p className="mt-4 font-sans text-[0.6875rem] uppercase tracking-[0.16em] text-[#B9733A]">
                   {categoryLabel(item.category)}
                 </p>
-                <h3 className="mt-1 font-display text-[1.375rem] uppercase leading-none tracking-tight text-[#7A2E12]">
+                <h2 className="mt-1 font-display text-[1.375rem] uppercase leading-none tracking-tight text-[#7A2E12]">
                   {item.name}
-                </h3>
+                </h2>
                 <p className="mt-2 line-clamp-2 flex-1 text-[0.8125rem] leading-relaxed text-[#7A6455]">
                   {item.description}
                 </p>
+
                 <div className="mt-4 flex items-center justify-between gap-3">
                   <p className="font-display text-[1.25rem] leading-none tracking-tight text-[#7A2E12]">
-                    ${item.price.toFixed(2)}
+                    ${Number(item.price).toFixed(2)}
                   </p>
 
-                  <Link
-                    href={`/menu/${item._id}`}
-                    className="rounded-full border border-[#3B2417] px-4 py-2 font-sans text-[0.875rem] text-[#3B2417] transition-colors hover:bg-[#3B2417] hover:text-[#F5EDE3]"
-                  >
-                    View Details
-                  </Link>
+                  {status === "approved" ? (
+                    <Link
+                      href={`/menu/${item._id}`}
+                      className="rounded-full border border-[#3B2417] px-4 py-2 font-sans text-[0.875rem] text-[#3B2417] transition-colors hover:bg-[#3B2417] hover:text-[#F5EDE3]"
+                    >
+                      View Details
+                    </Link>
+                  ) : (
+                    <span className="font-sans text-[0.75rem] text-[#7A6455]">
+                      {status === "pending" ? "Awaiting review" : "Not public yet"}
+                    </span>
+                  )}
                 </div>
               </li>
             );

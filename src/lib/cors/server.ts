@@ -1,17 +1,24 @@
-import { redirect } from "next/navigation";
 
-export const protectedMutation = async (api: string, method: string, data?: unknown) => {
-   
-    const res = await fetch(api, {
-        method: method,
-        headers: {
-            'content-type': 'application/json',
-          
-        },
-        body: data ? JSON.stringify(data) : null
-    })
-    if (res.status === 401 || res.status === 403) {
-        redirect("/unauthorized");
-    }
-    return res;
-}
+import { headers } from "next/headers";
+
+export const protectedMutation = async (
+  api: string,
+  method: string,
+  data?: unknown,
+): Promise<Response> => {
+  const requestHeaders = await headers();
+
+  const cookie = requestHeaders.get("cookie") ?? "";
+
+  const res = await fetch(api, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      ...(cookie ? { cookie } : {}),
+    },
+    body: data !== undefined ? JSON.stringify(data) : undefined,
+    cache: "no-store",
+  });
+
+  return res;
+};

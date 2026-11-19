@@ -25,6 +25,7 @@ import type { CardPizza } from "@/lib/types";
 type PageProps = {
   params: Promise<{ id: string }>;
 };
+export const instant = false;
 
 type PizzaDetail = {
   id: string;

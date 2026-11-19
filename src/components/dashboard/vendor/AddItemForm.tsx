@@ -147,8 +147,11 @@ const AddItemForm = () => {
     try {
       // await is required, otherwise errors are never caught here.
       const res = await createPizzaPost(postData);
-      console.log(res);
-
+      if (!res.ok) {
+        toast.dismiss(loadingToast);
+        toast.error("Could not create the item", { description: res.message });
+        return;
+      }
       toast.dismiss(loadingToast);
       toast.success("Menu item submitted", {
         description: `${cleanName} is pending admin approval.`,
