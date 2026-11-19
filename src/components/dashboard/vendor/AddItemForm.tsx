@@ -10,7 +10,7 @@ import {
   PIZZA_CATEGORIES,
   type AddItemPayload,
   type PizzaCategory,
-} from "@/lib/types/menu-item";
+} from "@/lib/types";
 import { authClient } from "@/lib/auth-client";
 
 /* ---------- Config ---------- */
@@ -89,6 +89,7 @@ const AddItemForm = () => {
     setLocation("");
     setImages([]);
   };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -125,10 +126,9 @@ const AddItemForm = () => {
         description: "Please sign in to create a menu item.",
       });
     }
-
     const postData: AddItemPayload = {
       name: cleanName,
-      category, // narrowed to PizzaCategory by the check above
+      category,
       description: cleanDescription,
       price: priceNumber,
       location: cleanLocation,
@@ -138,6 +138,7 @@ const AddItemForm = () => {
       vendorName: user.name,
       vendorEmail: user.email,
       vendorImage: user.image ?? null,
+      status: "pending", // vendor নতুন item বানালে সবসময় pending
     };
 
     setIsSubmitting(true);
@@ -149,8 +150,8 @@ const AddItemForm = () => {
       console.log(res);
 
       toast.dismiss(loadingToast);
-      toast.success("Menu item created", {
-        description: `${cleanName} is now on the menu.`,
+      toast.success("Menu item submitted", {
+        description: `${cleanName} is pending admin approval.`,
       });
 
       resetForm();

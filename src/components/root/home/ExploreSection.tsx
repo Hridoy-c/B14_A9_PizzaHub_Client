@@ -1,6 +1,6 @@
 import React, { Suspense } from "react";
 import PizzaCard from "@/components/root/home/PizzaCard";
-import { getPizzas } from "@/lib/api/new-pizza";
+import { getPizzas } from "@/lib/api/menu-item";
 import { toCardPizza } from "@/lib/utils/menu";
 
 const MAX_VISIBLE_ITEMS = 6;

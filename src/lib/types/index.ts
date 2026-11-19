@@ -27,16 +27,15 @@ export type AddItemPayload = {
   price: number;
   location: string;
   images: string[];
-  /** Cover image, same as images[0]. */
   image: string;
-  /** The vendor's ID. */
   vendorId: string;
-  /** The vendor's name. */
   vendorName: string;
-  /** The vendor's email. */
   vendorEmail: string;
   vendorImage?: string | null;
+  /** নতুন আইটেম সবসময় "pending" দিয়ে শুরু হয়, admin approve করলে "approved" হয়। */
+  status: MenuItemStatus;
 };
+
 /** What your server stores and returns. */
 export type MenuItem = AddItemPayload & {
   _id: string;
@@ -60,3 +59,12 @@ export type CardPizza = {
   category?: string;
   emoji?: string;
 };
+
+export const MENU_ITEM_STATUSES = [
+  "pending",
+  "approved",
+  "rejected",
+  "inactive",
+] as const;
+
+export type MenuItemStatus = (typeof MENU_ITEM_STATUSES)[number];

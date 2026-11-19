@@ -1,7 +1,7 @@
 import React from "react";
 import PizzaCard from "@/components/root/home/PizzaCard";
-import { getPizzas } from "@/lib/api/new-pizza";
-import { PIZZA_CATEGORIES } from "@/lib/types/menu-item";
+import { getPizzas } from "@/lib/api/menu-item";
+import { PIZZA_CATEGORIES } from "@/lib/types";
 
 export const metadata = {
   title: "Menu | PizzaHub",

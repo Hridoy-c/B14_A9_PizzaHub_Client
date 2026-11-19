@@ -17,10 +17,10 @@ import {
 import MenuGallery from "@/components/root/menu/MenuGallery";
 import OrderForm from "@/components/root/menu/OrderForm";
 import PizzaCard from "@/components/root/home/PizzaCard";
-import { getPizzas, getPizzasById } from "@/lib/api/new-pizza";
+import { getPizzas, getPizzasById } from "@/lib/api/menu-item";
 import { getCurrentUser } from "@/lib/cors/Session";
 import { categoryLabel, toCardPizza } from "@/lib/utils/menu";
-import type { CardPizza } from "@/lib/types/menu-item";
+import type { CardPizza } from "@/lib/types";
 
 type PageProps = {
   params: Promise<{ id: string }>;

@@ -1,8 +1,4 @@
-import {
-  PIZZA_CATEGORIES,
-  type CardPizza,
-  type MenuItem,
-} from "@/lib/types/menu-item";
+import { PIZZA_CATEGORIES, type CardPizza, type MenuItem } from "@/lib/types";
 
 /** Maps a stored category slug ("classic") to its display label. */
 export const categoryLabel = (value: string) =>
