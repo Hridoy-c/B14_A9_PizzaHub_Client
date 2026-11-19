@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import PizzaCard from "@/components/home/PizzaCard";
+import PizzaCard from "@/components/root/home/PizzaCard";
 import {
   exploreCategories,
   explorePizzas,
   type ExploreCategory,
-} from "@/components/home/Explore-data";
+} from "@/components/root/home/Explore-data";
 
 const MAX_VISIBLE_ITEMS = 6;
 

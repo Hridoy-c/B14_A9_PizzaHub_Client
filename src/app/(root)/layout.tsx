@@ -1,6 +1,6 @@
 import Footer from "@/components/shared/footer/Footer";
 import Navbar from "@/components/shared/navbar/Navbar";
-import GridRule from "@/components/home/GridRule";
+import GridRule from "@/components/root/home/GridRule";
 import React from "react";
 import { getCurrentUser } from "@/lib/cors/Session";
 

@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import mainPizza from "../../assets/images/pizza-hero.png";
-import sliceLeft from "../../assets/images/pizza-slice-left.png";
-import sliceRight from "../../assets/images/pizza-slice-right.png";
+import mainPizza from "../../../assets/images/pizza-hero.png";
+import sliceLeft from "../../../assets/images/pizza-slice-left.png";
+import sliceRight from "../../../assets/images/pizza-slice-right.png";
 
 const badgeClass =
   "absolute z-30 hidden rounded-xl border border-[#EADBC8] bg-white px-3 py-2 font-sans text-[0.75rem] text-[#3B2417] shadow-md md:block";

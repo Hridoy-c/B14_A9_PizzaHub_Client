@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Logo from "@/components/shared/navbar/Logo";
-import GridRule from "@/components/home/GridRule";
+import GridRule from "@/components/root/home/GridRule";
 
 const AuthLayout = ({ children }: { children: React.ReactNode }) => {
   return (

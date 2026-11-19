@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import sliceLeft from "../../assets/images/pizza-slice-left.png";
-import sliceRight from "../../assets/images/pizza-slice-right.png";
+import sliceLeft from "../../../assets/images/pizza-slice-left.png";
+import sliceRight from "../../../assets/images/pizza-slice-right.png";
 
 
 const sideSliceClass =

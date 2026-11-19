@@ -11,7 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import type { ExplorePizza } from "@/components/home/Explore-data";
+import type { ExplorePizza } from "@/components/root/home/Explore-data";
 
 type PizzaCardProps = {
   pizza: ExplorePizza;

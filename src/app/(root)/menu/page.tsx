@@ -1,10 +1,10 @@
 import React from "react";
-import PizzaCard from "@/components/home/PizzaCard";
+import PizzaCard from "@/components/root/home/PizzaCard";
 import {
   categorySlug,
   exploreCategories,
   explorePizzas,
-} from "@/components/home/Explore-data";
+} from "@/components/root/home/Explore-data";
 
 export const metadata = {
   title: "Menu | PizzaHub",

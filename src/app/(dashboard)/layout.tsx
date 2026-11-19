@@ -1,5 +1,5 @@
 import React from 'react'
-import GridRule from '@/components/home/GridRule'
+import GridRule from '@/components/root/home/GridRule'
 import { requireUser } from '@/lib/cors/Session'
 import DashboardSidebar from '@/components/dashboard/DashboardSidebar'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
