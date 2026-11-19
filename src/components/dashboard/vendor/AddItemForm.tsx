@@ -11,6 +11,7 @@ import {
   type AddItemPayload,
   type PizzaCategory,
 } from "@/lib/types/menu-item";
+import { authClient } from "@/lib/auth-client";
 
 /* ---------- Config ---------- */
 
@@ -18,8 +19,7 @@ const MAX_DESCRIPTION = 400;
 
 /* ---------- Shared styles ---------- */
 
-const cardClass =
-  "rounded-3xl border border-[#EADBC8] bg-[#FBF6EF] p-5 sm:p-7";
+const cardClass = "rounded-3xl border border-[#EADBC8] bg-[#FBF6EF] p-5 sm:p-7";
 const cardTitleClass =
   "font-display text-[1.625rem] leading-none tracking-tight text-[#3B2417]";
 const cardHintClass = "mt-2 text-[0.9375rem] leading-relaxed text-[#7A6455]";
@@ -89,7 +89,6 @@ const AddItemForm = () => {
     setLocation("");
     setImages([]);
   };
-
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -117,6 +116,16 @@ const AddItemForm = () => {
       });
     }
 
+    // Vendor details come from the signed-in user, never from the form.
+    const { data: session } = await authClient.getSession();
+    const user = session?.user;
+
+    if (!user) {
+      return toast.error("You must be signed in", {
+        description: "Please sign in to create a menu item.",
+      });
+    }
+
     const postData: AddItemPayload = {
       name: cleanName,
       category, // narrowed to PizzaCategory by the check above
@@ -125,6 +134,10 @@ const AddItemForm = () => {
       location: cleanLocation,
       images,
       image: images[0],
+      vendorId: user.id,
+      vendorName: user.name,
+      vendorEmail: user.email,
+      vendorImage: user.image ?? null,
     };
 
     setIsSubmitting(true);

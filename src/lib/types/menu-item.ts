@@ -29,8 +29,14 @@ export type AddItemPayload = {
   images: string[];
   /** Cover image, same as images[0]. */
   image: string;
+  /** The vendor's ID. */
+  vendorId: string;
+  /** The vendor's name. */
+  vendorName: string;
+  /** The vendor's email. */
+  vendorEmail: string;
+  vendorImage?: string | null;
 };
-
 /** What your server stores and returns. */
 export type MenuItem = AddItemPayload & {
   _id: string;
