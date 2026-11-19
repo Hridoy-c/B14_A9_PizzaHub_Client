@@ -1,22 +1,49 @@
-"use client";
-
-import React, { useState } from "react";
+import React, { Suspense } from "react";
 import PizzaCard from "@/components/root/home/PizzaCard";
-import {
-  exploreCategories,
-  explorePizzas,
-  type ExploreCategory,
-} from "@/components/root/home/Explore-data";
+import { getPizzas } from "@/lib/api/new-pizza";
+import { toCardPizza } from "@/lib/utils/menu";
 
 const MAX_VISIBLE_ITEMS = 6;
 
+const CardsSkeleton = () => (
+  <ul
+    aria-hidden="true"
+    className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+  >
+    {Array.from({ length: MAX_VISIBLE_ITEMS }).map((_, index) => (
+      <li key={index} className="animate-pulse rounded-3xl bg-[#F8EDDC] p-4">
+        <div className="aspect-[4/3] w-full rounded-2xl bg-[#EADBC8]" />
+        <div className="mt-4 h-4 w-2/3 rounded-full bg-[#EADBC8]" />
+        <div className="mt-3 h-3 w-full rounded-full bg-[#EADBC8]" />
+        <div className="mt-2 h-3 w-4/5 rounded-full bg-[#EADBC8]" />
+      </li>
+    ))}
+  </ul>
+);
+
+/** Fetches the real menu from the API and shows the first 6 items. */
+const ExploreList = async () => {
+  const pizzas = await getPizzas();
+  const items = pizzas.slice(0, MAX_VISIBLE_ITEMS).map(toCardPizza);
+
+  if (items.length === 0) {
+    return (
+      <p className="mt-6 rounded-3xl border border-dashed border-[#EADBC8] bg-[#F5EDE3] p-10 text-center font-body text-[0.9375rem] text-[#7A6455]">
+        No dishes are on the menu right now. Please check back soon.
+      </p>
+    );
+  }
+
+  return (
+    <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {items.map((pizza, index) => (
+        <PizzaCard key={pizza.id} pizza={pizza} priority={index < 3} />
+      ))}
+    </ul>
+  );
+};
+
 const ExploreSection = () => {
-  const [active, setActive] = useState<ExploreCategory>(exploreCategories[0]);
-
-  const items = explorePizzas
-    .filter((pizza) => pizza.category === active)
-    .slice(0, MAX_VISIBLE_ITEMS);
-
   return (
     <section
       aria-labelledby="explore-heading"
@@ -37,40 +64,10 @@ const ExploreSection = () => {
           </p>
         </div>
 
-        {/* Category tabs */}
-        <div
-          role="tablist"
-          aria-label="Pizza categories"
-          className="mt-8 flex flex-wrap gap-2 md:mt-10"
-        >
-          {exploreCategories.map((category) => {
-            const selected = category === active;
-
-            return (
-              <button
-                key={category}
-                type="button"
-                role="tab"
-                aria-selected={selected}
-                onClick={() => setActive(category)}
-                className={`rounded-full px-4 py-2 font-sans text-[0.75rem] uppercase tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B9733A]/50 ${
-                  selected
-                    ? "bg-[#6B4332] text-[#F5EDE3]"
-                    : "bg-[#F5EDE3] text-[#6B4332] hover:bg-[#EADBC8]"
-                }`}
-              >
-                {category}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Cards */}
-        <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((pizza, index) => (
-            <PizzaCard key={pizza.id} pizza={pizza} priority={index < 3} />
-          ))}
-        </ul>
+        {/* Cards — real data, newest six items */}
+        <Suspense fallback={<CardsSkeleton />}>
+          <ExploreList />
+        </Suspense>
       </div>
     </section>
   );

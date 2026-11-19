@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
-  ArrowLeft,
   ArrowRight,
   Bike,
   ChefHat,
@@ -16,9 +15,10 @@ import {
 } from "lucide-react";
 
 import MenuGallery from "@/components/root/menu/MenuGallery";
+import OrderForm from "@/components/root/menu/OrderForm";
 import PizzaCard from "@/components/root/home/PizzaCard";
-import { explorePizzas } from "@/components/root/home/Explore-data";
 import { getPizzas, getPizzasById } from "@/lib/api/new-pizza";
+import { getCurrentUser } from "@/lib/cors/Session";
 import { categoryLabel, toCardPizza } from "@/lib/utils/menu";
 import type { CardPizza } from "@/lib/types/menu-item";
 
@@ -39,27 +39,12 @@ type PizzaDetail = {
   vendorEmail?: string;
 };
 
-const fallbackDetail = (id: string): PizzaDetail | null => {
-  const item = explorePizzas.find((pizza) => pizza.id === id);
-  if (!item) return null;
-
-  return {
-    id: item.id,
-    name: item.name,
-    description: item.description,
-    price: item.price,
-    category: item.category,
-    images: item.image ? [item.image] : [],
-    rating: item.rating,
-  };
-};
-
 /** One list request per render, shared by the detail and related lookups. */
 const loadAllPizzas = cache(getPizzas);
 
 /**
  * Memoised per request so `generateMetadata` and the page share one lookup.
- * Database items win; the static home cards act as a graceful fallback.
+ * Unknown ids resolve to `null`, which renders the 404 page.
  */
 const loadPizza = cache(async (id: string): Promise<PizzaDetail | null> => {
   // The by-id endpoint is tried first, then the list is searched (some
@@ -69,7 +54,7 @@ const loadPizza = cache(async (id: string): Promise<PizzaDetail | null> => {
     (await loadAllPizzas()).find((pizza) => String(pizza._id) === id) ??
     null;
 
-  if (!item) return fallbackDetail(id);
+  if (!item) return null;
 
   const images = [item.image, ...(item.images ?? [])].filter(
     (src): src is string => Boolean(src),
@@ -91,7 +76,7 @@ const loadPizza = cache(async (id: string): Promise<PizzaDetail | null> => {
 const loadRelated = async (pizza: PizzaDetail): Promise<CardPizza[]> => {
   const items = await loadAllPizzas();
 
-  const sameCategory = items
+  return items
     .filter(
       (item) =>
         String(item._id) !== pizza.id &&
@@ -99,21 +84,6 @@ const loadRelated = async (pizza: PizzaDetail): Promise<CardPizza[]> => {
     )
     .slice(0, 3)
     .map(toCardPizza);
-
-  if (sameCategory.length > 0) return sameCategory;
-
-  return explorePizzas
-    .filter((item) => item.id !== pizza.id && item.category === pizza.category)
-    .slice(0, 3)
-    .map((item) => ({
-      id: item.id,
-      name: item.name,
-      price: item.price,
-      image: item.image,
-      description: item.description,
-      category: item.category,
-      rating: item.rating,
-    }));
 };
 
 export const generateMetadata = async ({
@@ -143,13 +113,12 @@ const MenuDetailsPage = async ({ params }: PageProps) => {
 
   if (!pizza) notFound();
 
+  const user = await getCurrentUser();
+  const role = String(user?.role ?? "").toLowerCase();
+  const canOrder = role === "customer";
+
   const related = await loadRelated(pizza);
   const hasVendorEmail = Boolean(pizza.vendorEmail);
-  const orderHref = hasVendorEmail
-    ? `mailto:${pizza.vendorEmail}?subject=${encodeURIComponent(
-        `Order: ${pizza.name}`,
-      )}`
-    : "/menu";
 
   const features = [
     {
@@ -303,38 +272,39 @@ const MenuDetailsPage = async ({ params }: PageProps) => {
             </a>
           )}
 
-          <div className="mt-auto pt-6">
-            <div className="flex flex-col gap-3 sm:flex-row">
-              {hasVendorEmail ? (
-                <a
-                  href={orderHref}
-                  className="inline-flex min-h-[46px] flex-1 items-center justify-center gap-2 rounded-full bg-[#3B2417] px-6 py-3.5 font-sans text-[0.9375rem] text-[#F5EDE3] shadow-[0_16px_32px_-18px_rgba(59,36,23,0.8)] transition-all hover:-translate-y-0.5 hover:bg-[#2A1A10] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B9733A]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#FBF6EF]"
-                >
-                  Order now
-                  <ArrowRight className="size-4" aria-hidden="true" />
-                </a>
+          {/* Ordering — customers only */}
+          {canOrder ? (
+            <OrderForm
+              itemId={pizza.id}
+              itemName={pizza.name}
+              price={pizza.price}
+            />
+          ) : (
+            <div className="mt-6 rounded-2xl border border-dashed border-[#EADBC8] bg-[#F5EDE3] p-4">
+              {user ? (
+                <p className="font-sans text-[0.8125rem] leading-relaxed text-[#7A6455]">
+                  Only customer accounts can place orders. You are signed in as{" "}
+                  <span className="uppercase tracking-wide text-[#3B2417]">
+                    {role}
+                  </span>
+                  .
+                </p>
               ) : (
-                <Link
-                  href="/menu"
-                  className="inline-flex min-h-[46px] flex-1 items-center justify-center gap-2 rounded-full bg-[#3B2417] px-6 py-3.5 font-sans text-[0.9375rem] text-[#F5EDE3] shadow-[0_16px_32px_-18px_rgba(59,36,23,0.8)] transition-all hover:-translate-y-0.5 hover:bg-[#2A1A10] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B9733A]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#FBF6EF]"
-                >
-                  Browse the menu
-                  <ArrowRight className="size-4" aria-hidden="true" />
-                </Link>
-              )}
-
-              {hasVendorEmail && (
-                <Link
-                  href="/menu"
-                  className="inline-flex min-h-[46px] items-center justify-center gap-2 rounded-full border border-[#3B2417]/25 px-6 py-3.5 font-sans text-[0.9375rem] text-[#3B2417] transition-colors hover:bg-[#3B2417]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B9733A]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#FBF6EF]"
-                >
-                  <ArrowLeft className="size-4" aria-hidden="true" />
-                  All pizzas
-                </Link>
+                <p className="font-sans text-[0.8125rem] leading-relaxed text-[#7A6455]">
+                  <Link
+                    href="/sign-in"
+                    className="text-[#B9733A] underline underline-offset-2 transition-colors hover:text-[#7A2E12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B9733A]/50"
+                  >
+                    Sign in
+                  </Link>{" "}
+                  as a customer to order this item.
+                </p>
               )}
             </div>
+          )}
 
-            <p className="mt-3 text-center font-body text-[0.75rem] leading-relaxed text-[#7A6455] sm:text-left">
+          <div className="mt-auto pt-6">
+            <p className="text-center font-body text-[0.75rem] leading-relaxed text-[#7A6455] sm:text-left">
               Free delivery on orders over $25. Baked fresh when you order.
             </p>
           </div>

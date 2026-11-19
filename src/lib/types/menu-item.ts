@@ -45,9 +45,8 @@ export type MenuItem = AddItemPayload & {
 };
 
 /**
- * The subset of a pizza that `PizzaCard` renders. Both database items
- * (`MenuItem`, mapped in the menu page) and the static home cards
- * (`ExplorePizza`) fit this shape.
+ * The subset of a pizza that `PizzaCard` renders. Database items
+ * (`MenuItem`) are mapped to this shape by `toCardPizza`.
  */
 export type CardPizza = {
   id: string;

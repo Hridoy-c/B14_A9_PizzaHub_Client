@@ -39,6 +39,12 @@ const MenuGallery = ({ images, name }: MenuGalleryProps) => {
           <ChefHat className="size-3.5 text-[#B9733A]" aria-hidden="true" />
           Freshly baked
         </span>
+
+        {photos.length > 1 && (
+          <span className="absolute bottom-4 right-4 rounded-full bg-[#3B2417]/85 px-3 py-1.5 font-sans text-[0.6875rem] uppercase tracking-[0.14em] text-[#F5EDE3] shadow-sm backdrop-blur">
+            {active + 1} / {photos.length} photos
+          </span>
+        )}
       </div>
 
       {photos.length > 1 && (
