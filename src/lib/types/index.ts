@@ -90,9 +90,10 @@ export type Order = {
   message?: string;
   status: OrderStatus;
   createdAt: string;
+  /** Joined from `user` on the vendor orders endpoint. */
+  customer?: { name: string; email: string; image?: string | null };
   /** Joined from menuItems; missing if the item was deleted. */
   item?: {
-    customer?: { name: string; email: string; image?: string | null };
     name: string;
     image?: string;
     images?: string[];
