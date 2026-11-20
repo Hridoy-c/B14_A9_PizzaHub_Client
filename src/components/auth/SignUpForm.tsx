@@ -94,7 +94,7 @@ const SignUpForm = () => {
         name,
         email,
         password,
-        role,
+        accountType: role,
         ...(imageUrl ? { image: imageUrl } : {}),
       });
 
