@@ -1,5 +1,7 @@
-import React from "react";
+import React, { Suspense, cache } from "react";
 import PizzaCard from "@/components/root/home/PizzaCard";
+import MenuSearchBar from "@/components/root/menu/MenuSearchBar";
+import MenuFilters from "@/components/root/menu/MenuFilters";
 import { getPizzas } from "@/lib/api/menu-item";
 import { PIZZA_CATEGORIES } from "@/lib/types";
 
@@ -9,16 +11,76 @@ export const metadata = {
     "The full PizzaHub menu — classic and gourmet pizzas, vegetarian favourites, meat lovers, sides, drinks and desserts, baked to order.",
 };
 
-// Uncached data (`cache: "no-store"` in getPizzas) already renders at request
-// time under Cache Components, so no route segment config is needed here.
-const MenuPage = async () => {
-  const allPizzas = await getPizzas();
+type PageProps = {
+  searchParams: Promise<{ q?: string; category?: string; location?: string }>;
+};
 
-  // Shape the real data for PizzaCard, grouped by category slug.
-  const sections = PIZZA_CATEGORIES.map((category) => ({
-    ...category,
+const loadAllPizzas = cache(() => getPizzas());
+
+const toolbarClass =
+  "mt-8 flex flex-col gap-4 rounded-3xl border border-[#EADBC8] bg-[#FBF6EF] p-4 sm:p-5";
+
+const ToolbarSkeleton = () => (
+  <div aria-busy="true" className={toolbarClass}>
+    <div className="h-[3.25rem] animate-pulse rounded-full bg-[#EADBC8]" />
+    <div className="flex gap-2">
+      {[0, 1, 2, 3].map((i) => (
+        <div
+          key={i}
+          className="h-9 w-28 animate-pulse rounded-full bg-[#EADBC8]"
+        />
+      ))}
+    </div>
+  </div>
+);
+
+const MenuSkeleton = () => (
+  <ul aria-busy="true" className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    {[0, 1, 2, 3, 4, 5].map((i) => (
+      <li key={i} className="animate-pulse rounded-3xl bg-[#F8EDDC] p-4">
+        <div className="aspect-[4/3] w-full rounded-2xl bg-[#EADBC8]" />
+        <div className="mt-4 h-4 w-2/3 rounded-full bg-[#EADBC8]" />
+        <div className="mt-3 h-3 w-full rounded-full bg-[#EADBC8]" />
+        <div className="mt-2 h-3 w-4/5 rounded-full bg-[#EADBC8]" />
+      </li>
+    ))}
+  </ul>
+);
+
+const MenuToolbar = async () => {
+  const pizzas = await loadAllPizzas();
+
+  const locations = Array.from(
+    new Set(
+      pizzas
+        .map((pizza) => pizza.location?.trim())
+        .filter((location): location is string => Boolean(location)),
+    ),
+  ).sort((a, b) => a.localeCompare(b));
+
+  return (
+    <div className={toolbarClass}>
+      <MenuSearchBar />
+      <MenuFilters locations={locations} />
+    </div>
+  );
+};
+
+const MenuSections = async ({ searchParams }: PageProps) => {
+  const { q, category, location } = await searchParams;
+
+  const allPizzas = await getPizzas({
+    q: q?.trim(),
+    category,
+    location,
+  });
+
+  const hasFilters = Boolean(q?.trim() || category || location);
+
+  const sections = PIZZA_CATEGORIES.map((item) => ({
+    ...item,
     items: allPizzas
-      .filter((pizza) => pizza.category === category.value)
+      .filter((pizza) => pizza.category === item.value)
       .map((pizza) => ({
         id: String(pizza._id),
         name: pizza.name,
@@ -28,9 +90,56 @@ const MenuPage = async () => {
       })),
   })).filter((section) => section.items.length > 0);
 
+  if (sections.length === 0) {
+    return (
+      <p className="mt-12 rounded-3xl border border-dashed border-[#EADBC8] bg-[#FBF6EF] p-10 text-center text-[0.9375rem] text-[#7A6455]">
+        {hasFilters
+          ? "No pizzas match your search. Try clearing a filter."
+          : "The menu is empty right now. Please check back soon."}
+      </p>
+    );
+  }
+
+  return (
+    <div className="mt-12 flex flex-col gap-14 md:gap-16">
+      {sections.map((section, sectionIndex) => (
+        <section
+          key={section.value}
+          id={section.value}
+          aria-labelledby={`menu-${section.value}`}
+          className="scroll-mt-24"
+        >
+          <div className="flex items-end justify-between gap-4 border-b border-[#EADBC8] pb-3">
+            <h2
+              id={`menu-${section.value}`}
+              className="font-display text-[clamp(1.5rem,1.1rem+1.4vw,2.25rem)] uppercase leading-none tracking-tight text-[#3B2417]"
+            >
+              {section.label}
+            </h2>
+            <span className="font-sans text-[0.75rem] uppercase tracking-wide text-[#B9733A]">
+              {section.items.length}{" "}
+              {section.items.length === 1 ? "item" : "items"}
+            </span>
+          </div>
+
+          <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {section.items.map((pizza, index) => (
+              <PizzaCard
+                key={pizza.id}
+                pizza={pizza}
+                priority={sectionIndex === 0 && index < 3}
+              />
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  );
+};
+
+const MenuPage = ({ searchParams }: PageProps) => {
   return (
     <div className="mx-auto w-[90vw] max-w-[1200px] py-12 md:py-16">
-      {/* Header */}
       <header className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="font-sans text-[0.75rem] uppercase tracking-[0.18em] text-[#B9733A]">
@@ -41,66 +150,18 @@ const MenuPage = async () => {
           </h1>
         </div>
         <p className="max-w-[38ch] font-body text-[0.9375rem] leading-relaxed text-[#7A6455]">
-          Stone-baked pizzas, sides, drinks and desserts. Pick a favourite below
-          or jump straight to a section.
+          Stone-baked pizzas, sides, drinks and desserts. Search, filter by
+          category or location, and pick a favourite.
         </p>
       </header>
 
-      {sections.length === 0 ? (
-        <p className="mt-12 rounded-3xl border border-dashed border-[#EADBC8] bg-[#FBF6EF] p-10 text-center text-[0.9375rem] text-[#7A6455]">
-          The menu is empty right now. Please check back soon.
-        </p>
-      ) : (
-        <>
-          {/* Section pills */}
-          <nav aria-label="Menu sections" className="mt-8 flex flex-wrap gap-2">
-            {sections.map((section) => (
-              <a
-                key={section.value}
-                href={`#${section.value}`}
-                className="rounded-full bg-[#F5EDE3] px-4 py-2 font-sans text-[0.75rem] uppercase tracking-wide text-[#6B4332] transition-colors hover:bg-[#EADBC8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B9733A]/50"
-              >
-                {section.label}
-              </a>
-            ))}
-          </nav>
+      <Suspense fallback={<ToolbarSkeleton />}>
+        <MenuToolbar />
+      </Suspense>
 
-          {/* Sections */}
-          <div className="mt-12 flex flex-col gap-14 md:gap-16">
-            {sections.map((section, sectionIndex) => (
-              <section
-                key={section.value}
-                id={section.value}
-                aria-labelledby={`menu-${section.value}`}
-                className="scroll-mt-24"
-              >
-                <div className="flex items-end justify-between gap-4 border-b border-[#EADBC8] pb-3">
-                  <h2
-                    id={`menu-${section.value}`}
-                    className="font-display text-[clamp(1.5rem,1.1rem+1.4vw,2.25rem)] uppercase leading-none tracking-tight text-[#3B2417]"
-                  >
-                    {section.label}
-                  </h2>
-                  <span className="font-sans text-[0.75rem] uppercase tracking-wide text-[#B9733A]">
-                    {section.items.length}{" "}
-                    {section.items.length === 1 ? "item" : "items"}
-                  </span>
-                </div>
-
-                <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {section.items.map((pizza, index) => (
-                    <PizzaCard
-                      key={pizza.id}
-                      pizza={pizza}
-                      priority={sectionIndex === 0 && index < 3}
-                    />
-                  ))}
-                </ul>
-              </section>
-            ))}
-          </div>
-        </>
-      )}
+      <Suspense fallback={<MenuSkeleton />}>
+        <MenuSections searchParams={searchParams} />
+      </Suspense>
     </div>
   );
 };

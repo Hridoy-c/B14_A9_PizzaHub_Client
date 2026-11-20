@@ -11,9 +11,28 @@ const toList = (json: unknown): MenuItem[] => {
   return Array.isArray(data) ? (data as MenuItem[]) : [];
 };
 
-export const getPizzas = async (): Promise<MenuItem[]> => {
+export type MenuFilters = {
+  q?: string;
+  category?: string;
+  location?: string;
+};
+
+export const getPizzas = async (
+  filters: MenuFilters = {},
+): Promise<MenuItem[]> => {
   try {
-    const res = await fetch(`${BASE_URL}/api/menu`, { cache: "no-store" });
+    const params = new URLSearchParams();
+
+    if (filters.q) params.set("q", filters.q);
+    if (filters.category) params.set("category", filters.category);
+    if (filters.location) params.set("location", filters.location);
+
+    const query = params.toString();
+
+    const res = await fetch(
+      `${BASE_URL}/api/menu${query ? `?${query}` : ""}`,
+      { cache: "no-store" },
+    );
     if (!res.ok) return [];
 
     return toList(await res.json());
@@ -59,16 +78,15 @@ export const getMenuByVendor = async (
 };
 
 /**
- * Vendor dashboard: every item the signed-in vendor owns, including
- * pending and rejected ones. The API reads the session cookie, so the
- * vendor id is never trusted from the client.
+ * Vendor dashboard: every item the given vendor owns, including pending
+ * and rejected ones. The page passes the id of the signed-in vendor.
  */
-export const getMyMenu = async (cookie = ""): Promise<MenuItem[]> => {
+export const getMyMenu = async (vendorId: string): Promise<MenuItem[]> => {
   try {
-    const res = await fetch(`${BASE_URL}/api/vendor/menu`, {
-      cache: "no-store",
-      headers: { cookie },
-    });
+    const res = await fetch(
+      `${BASE_URL}/api/vendor/menu?vendorId=${encodeURIComponent(vendorId)}`,
+      { cache: "no-store" },
+    );
     if (!res.ok) return [];
 
     return toList(await res.json());

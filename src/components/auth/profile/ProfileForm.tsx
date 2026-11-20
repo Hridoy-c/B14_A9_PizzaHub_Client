@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Camera, Loader2, Mail, Trash2, User } from "lucide-react";
+import { Camera, Loader2, Lock, Trash2, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,13 +21,9 @@ export type ProfileUser = {
 
 type ProfileFormProps = {
   user: ProfileUser;
-  /** Called after a successful save (used to close the dialog). */
   onSaved?: () => void;
-  /** Called when the user cancels. */
   onCancel?: () => void;
 };
-
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const getInitials = (name: string) =>
   name
@@ -48,13 +44,11 @@ const ProfileForm = ({ user, onSaved, onCancel }: ProfileFormProps) => {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [name, setName] = useState(user.name ?? "");
-  const [email, setEmail] = useState(user.email ?? "");
   const [imageUrl, setImageUrl] = useState(user.image ?? "");
   const [preview, setPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // Revoke the last object URL when the preview changes or unmounts.
   useEffect(() => {
     return () => {
       if (preview) URL.revokeObjectURL(preview);
@@ -65,12 +59,8 @@ const ProfileForm = ({ user, onSaved, onCancel }: ProfileFormProps) => {
   const initials = getInitials(name);
 
   const trimmedName = name.trim();
-  const trimmedEmail = email.trim().toLowerCase();
-  const emailChanged = trimmedEmail !== user.email.toLowerCase();
   const dirty =
-    trimmedName !== user.name ||
-    emailChanged ||
-    imageUrl !== (user.image ?? "");
+    trimmedName !== user.name || imageUrl !== (user.image ?? "");
 
   const handleImageChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -121,13 +111,6 @@ const ProfileForm = ({ user, onSaved, onCancel }: ProfileFormProps) => {
       return;
     }
 
-    if (!EMAIL_PATTERN.test(trimmedEmail)) {
-      toast.error("That email does not look right", {
-        description: "Use a valid address like you@example.com.",
-      });
-      return;
-    }
-
     if (uploading) {
       toast.info("Photo is still uploading", {
         description: "Give it a second, then save.",
@@ -150,39 +133,9 @@ const ProfileForm = ({ user, onSaved, onCancel }: ProfileFormProps) => {
         return;
       }
 
-      if (emailChanged) {
-        const { error: emailError } = await authClient.changeEmail({
-          newEmail: trimmedEmail,
-          callbackURL: "/profile",
-        });
-
-        if (emailError) {
-          toast.error("Could not update your email", {
-            description: emailError.message ?? "Please try again.",
-          });
-          return;
-        }
-
-        // The server updates silently when the address is free, so confirm
-        // against the refreshed session before claiming success.
-        const { data: session } = await authClient.getSession();
-        const sessionEmail = session?.user?.email?.toLowerCase();
-
-        if (sessionEmail === trimmedEmail) {
-          toast.success("Email updated", {
-            description: `You now sign in with ${trimmedEmail}.`,
-          });
-        } else {
-          toast.info("Email change requested", {
-            description:
-              "That address may already be in use or needs verification. Your previous email is still active.",
-          });
-        }
-      } else {
-        toast.success("Profile updated", {
-          description: "Your changes have been saved.",
-        });
-      }
+      toast.success("Profile updated", {
+        description: "Your changes have been saved.",
+      });
 
       if (preview) URL.revokeObjectURL(preview);
       setPreview(null);
@@ -199,7 +152,6 @@ const ProfileForm = ({ user, onSaved, onCancel }: ProfileFormProps) => {
 
   return (
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4 font-sans">
-      {/* Avatar + upload */}
       <div className="flex items-center gap-4">
         <Avatar className="size-20 ring-2 ring-[#EADBC8]">
           <AvatarImage src={shownImage || undefined} alt={trimmedName || "Profile"} />
@@ -253,7 +205,6 @@ const ProfileForm = ({ user, onSaved, onCancel }: ProfileFormProps) => {
         </div>
       </div>
 
-      {/* Name */}
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="profile-name" className={labelClass}>
           Full name
@@ -274,7 +225,6 @@ const ProfileForm = ({ user, onSaved, onCancel }: ProfileFormProps) => {
         </div>
       </div>
 
-      {/* Email */}
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center justify-between gap-2">
           <Label htmlFor="profile-email" className={labelClass}>
@@ -289,26 +239,23 @@ const ProfileForm = ({ user, onSaved, onCancel }: ProfileFormProps) => {
           </span>
         </div>
         <div className="relative">
-          <Mail className={`${iconClass} left-3`} aria-hidden="true" />
+          <Lock className={`${iconClass} left-3`} aria-hidden="true" />
           <Input
             id="profile-email"
             name="email"
             type="email"
-            autoComplete="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            disabled={saving}
+            value={user.email}
+            readOnly
+            aria-readonly="true"
             aria-describedby="profile-email-hint"
-            className={iconInputClass}
+            className={`${iconInputClass} cursor-not-allowed bg-[#F5EDE3] text-[#7A6455]`}
           />
         </div>
         <p id="profile-email-hint" className="text-[0.6875rem] text-[#A08C7B]">
-          Changing this updates the address you sign in with.
+          Your email cannot be changed.
         </p>
       </div>
 
-      {/* Actions */}
       <div className="mt-1 flex items-center gap-2">
         {onCancel ? (
           <button

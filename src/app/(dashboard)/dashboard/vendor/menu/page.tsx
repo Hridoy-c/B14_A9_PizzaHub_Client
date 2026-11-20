@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { headers } from "next/headers";
 import { ImageOff, PlusCircle } from "lucide-react";
 import { requireUser } from "@/lib/cors/Session";
 import { categoryLabel } from "@/lib/utils/menu";
@@ -19,9 +18,8 @@ const statusStyles: Record<MenuItemStatus, string> = {
 
 const VendorMenuPage = async () => {
   const user = await requireUser();
-  const cookie = (await headers()).get("cookie") ?? "";
   // The vendor's own items in every state: pending, approved and rejected.
-  const items = await getMyMenu(cookie);
+  const items = await getMyMenu(user.id);
 
   return (
     <section className="flex flex-col gap-6">
