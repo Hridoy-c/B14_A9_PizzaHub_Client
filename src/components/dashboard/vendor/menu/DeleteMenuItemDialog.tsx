@@ -1,4 +1,3 @@
-// Save as: src/components/vendor/DeleteMenuItemDialog.tsx
 'use client'
 
 import { useState, useTransition } from 'react'
@@ -15,7 +14,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-// import { deleteMenuItemAction } from '@/app/(dashboard)/dashboard/vendor/menu/actions'
+import { deleteMenuItemAction } from '@/lib/actions/menus'
+// Adjust to wherever you saved the actions file.
 
 type DeleteMenuItemDialogProps = {
   item: { id: string; name: string }
@@ -27,14 +27,16 @@ const DeleteMenuItemDialog = ({ item }: DeleteMenuItemDialogProps) => {
 
   const handleDelete = () => {
     startTransition(async () => {
-    //   const result = await deleteMenuItemAction(item.id)
+      const result = await deleteMenuItemAction(item.id)
 
-    //   if (!result.ok) {
-    //     toast.error('Could not delete item', { description: result.error })
-    //     return
-    //   }
+      if (!result.ok) {
+        toast.error('Could not delete item', { description: result.message })
+        return
+      }
 
-      toast.success('Item deleted', { description: `${item.name} was removed from your menu.` })
+      toast.success('Item deleted', {
+        description: `${item.name} was removed from your menu.`,
+      })
       setOpen(false)
     })
   }

@@ -101,3 +101,67 @@ export const setMenuItemStatus = async (
     };
   }
 };
+
+
+type MutationResult = { ok: boolean; message?: string };
+
+
+
+const callMenuItem = async (
+  id: string,
+  method: "PATCH" | "DELETE",
+  payload?: Record<string, unknown>,
+): Promise<MutationResult> => {
+  const user = await requireUser();
+  const role = dashboardRole(user.role);
+
+  // The API also checks this, but fail fast before leaving the app.
+  if (role !== "vendor" && role !== "admin") {
+    return { ok: false, message: "You are not allowed to do that." };
+  }
+
+  if (!id) return { ok: false, message: "Missing item id" };
+
+  try {
+    const res = await fetch(`${BASE_URL}/api/menu/${encodeURIComponent(id)}`, {
+      method,
+      headers: {
+        "content-type": "application/json",
+        cookie: (await headers()).get("cookie") ?? "",
+      },
+      ...(payload ? { body: JSON.stringify(payload) } : {}),
+    });
+
+    const body = (await res.json().catch(() => null)) as {
+      message?: string;
+    } | null;
+
+    if (!res.ok) {
+      return {
+        ok: false,
+        message: body?.message ?? `Request failed (${res.status})`,
+      };
+    }
+
+    revalidatePath("/dashboard/vendor/menu");
+    revalidatePath("/menu");
+    revalidatePath("/");
+
+    return { ok: true, message: body?.message };
+  } catch (error) {
+    console.error(`Menu item ${method} error:`, error);
+    return {
+      ok: false,
+      message: "Could not reach the server. Is the API running?",
+    };
+  }
+};
+
+export const updateMenuItemAction = async (
+  id: string,
+  data: { name: string; description: string; price: number },
+): Promise<MutationResult> => callMenuItem(id, "PATCH", data);
+
+export const deleteMenuItemAction = async (
+  id: string,
+): Promise<MutationResult> => callMenuItem(id, "DELETE");

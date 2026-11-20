@@ -1,4 +1,3 @@
-// Save as: src/components/vendor/EditMenuItemDialog.tsx
 'use client'
 
 import { useState, useTransition } from 'react'
@@ -19,7 +18,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { inputClass, labelClass } from '@/components/auth/field-styles'
-// import { updateMenuItemAction } from '@/app/(dashboard)/dashboard/vendor/menu/actions'
+import { updateMenuItemAction } from '@/lib/actions/menus'
+// Adjust to wherever you saved the actions file.
 
 type EditMenuItemDialogProps = {
   item: { id: string; name: string; description: string; price: number }
@@ -33,19 +33,36 @@ const EditMenuItemDialog = ({ item }: EditMenuItemDialogProps) => {
     event.preventDefault()
     const form = new FormData(event.currentTarget)
 
+    const name = String(form.get('name') ?? '').trim()
+    const description = String(form.get('description') ?? '').trim()
+    const price = Number(form.get('price'))
+
+    if (!name) {
+      toast.error('Name is required')
+      return
+    }
+    if (!description) {
+      toast.error('Description is required')
+      return
+    }
+    if (!(price > 0)) {
+      toast.error('Price must be greater than 0')
+      return
+    }
+
     startTransition(async () => {
-    //   const result = await updateMenuItemAction(item.id, {
-    //     name: String(form.get('name') ?? ''),
-    //     description: String(form.get('description') ?? ''),
-    //     price: Number(form.get('price')),
-    //   })
+      const result = await updateMenuItemAction(item.id, {
+        name,
+        description,
+        price,
+      })
 
-    //   if (!result.ok) {
-    //     toast.error('Could not save changes', { description: result.error })
-    //     return
-    //   }
+      if (!result.ok) {
+        toast.error('Could not save changes', { description: result.message })
+        return
+      }
 
-      toast.success('Item updated', { description: `${item.name} has been saved.` })
+      toast.success('Item updated', { description: `${name} has been saved.` })
       setOpen(false)
     })
   }
@@ -74,7 +91,7 @@ const EditMenuItemDialog = ({ item }: EditMenuItemDialogProps) => {
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor={`name-${item.id}`} className={labelClass}>Name</Label>
             <Input
