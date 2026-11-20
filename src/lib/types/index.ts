@@ -68,3 +68,35 @@ export const MENU_ITEM_STATUSES = [
 ] as const;
 
 export type MenuItemStatus = (typeof MENU_ITEM_STATUSES)[number];
+
+
+
+export const ORDER_STATUSES = [
+  "pending",
+  "accepted",
+  "rejected",
+  "cancelled",
+] as const;
+
+export type OrderStatus = (typeof ORDER_STATUSES)[number];
+
+export type Order = {
+  _id: string;
+  itemId: string;
+  vendorId: string;
+  customerId: string;
+  deliveryDate: string;
+  deliveryAddress: string;
+  message?: string;
+  status: OrderStatus;
+  createdAt: string;
+  /** Joined from menuItems; missing if the item was deleted. */
+  item?: {
+    name: string;
+    image?: string;
+    images?: string[];
+    price: number;
+    category: string;
+    vendorName?: string;
+  };
+};
