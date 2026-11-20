@@ -37,3 +37,20 @@ export const getOrdersByVendor = async (
     return [];
   }
 };
+
+
+/** Admin dashboard: every order on the platform. */
+export const getAllOrdersForAdmin = async (cookie = ""): Promise<Order[]> => {
+  try {
+    const res = await fetch(`${BASE_URL}/api/admin/orders`, {
+      cache: "no-store",
+      headers: { cookie },
+    });
+    if (!res.ok) return [];
+
+    const json = await res.json();
+    return Array.isArray(json) ? json : (json.data ?? []);
+  } catch {
+    return [];
+  }
+};
