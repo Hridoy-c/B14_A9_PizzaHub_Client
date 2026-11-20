@@ -24,6 +24,9 @@ export const auth = betterAuth({
     minPasswordLength: 6,
   },
   user: {
+    deleteUser: {
+      enabled: true,
+    },
     additionalFields: {
       // Sent by the sign-up form; the hook below turns it into `role`.
       accountType: {
