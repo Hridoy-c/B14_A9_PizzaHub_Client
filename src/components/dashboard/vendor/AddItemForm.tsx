@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Check, ImagePlus, Loader2, MapPin } from "lucide-react";
 import ImageUploader from "./ImageUploader";
-import { createPizzaPost } from "@/lib/actions/pizza";
+import { createPizzaPost } from "@/lib/actions/menus";
 import {
   PIZZA_CATEGORIES,
   type AddItemPayload,

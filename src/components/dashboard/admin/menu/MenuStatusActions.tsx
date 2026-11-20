@@ -5,7 +5,7 @@ import { useState, useTransition } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import type { MenuItemStatus } from "@/lib/types";
-import { setMenuItemStatus } from "@/lib/actions/pizza";
+import { setMenuItemStatus } from "@/lib/actions/menus";
 
 const MenuStatusActions = ({
   id,

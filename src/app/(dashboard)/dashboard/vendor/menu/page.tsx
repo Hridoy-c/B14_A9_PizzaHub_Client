@@ -1,3 +1,4 @@
+// src/app/(dashboard)/dashboard/vendor/menu/page.tsx
 import Image from "next/image";
 import Link from "next/link";
 import { ImageOff, PlusCircle } from "lucide-react";
@@ -5,6 +6,8 @@ import { requireUser } from "@/lib/cors/Session";
 import { categoryLabel } from "@/lib/utils/menu";
 import type { MenuItemStatus } from "@/lib/types";
 import { getMyMenu } from "@/lib/api/menu-item";
+import EditMenuItemDialog from "@/components/dashboard/vendor/menu/EditMenuItemDialog";
+import DeleteMenuItemDialog from "@/components/dashboard/vendor/menu/DeleteMenuItemDialog";
 
 // Reads the session, so it blocks instead of prerendering.
 export const instant = false;
@@ -49,12 +52,13 @@ const VendorMenuPage = async () => {
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((item) => {
+            const id = String(item._id);
             const status: MenuItemStatus = item.status ?? "pending";
             const cover = item.image ?? item.images?.[0];
 
             return (
               <li
-                key={String(item._id)}
+                key={id}
                 className="flex flex-col rounded-3xl border border-[#EADBC8] bg-[#FBF6EF] p-4"
               >
                 <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-[#EADBC8]">
@@ -96,7 +100,7 @@ const VendorMenuPage = async () => {
 
                   {status === "approved" ? (
                     <Link
-                      href={`/menu/${item._id}`}
+                      href={`/menu/${id}`}
                       className="rounded-full border border-[#3B2417] px-4 py-2 font-sans text-[0.875rem] text-[#3B2417] transition-colors hover:bg-[#3B2417] hover:text-[#F5EDE3]"
                     >
                       View Details
@@ -106,6 +110,19 @@ const VendorMenuPage = async () => {
                       {status === "pending" ? "Awaiting review" : "Not public yet"}
                     </span>
                   )}
+                </div>
+
+                {/* Manage */}
+                <div className="mt-4 flex gap-2 border-t border-[#EADBC8] pt-4 font-sans">
+                  <EditMenuItemDialog
+                    item={{
+                      id,
+                      name: item.name,
+                      description: item.description,
+                      price: Number(item.price),
+                    }}
+                  />
+                  <DeleteMenuItemDialog item={{ id, name: item.name }} />
                 </div>
               </li>
             );
