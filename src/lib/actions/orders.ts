@@ -117,3 +117,48 @@ export const setOrderStatus = async (
     };
   }
 };
+
+
+export const cancelOrder = async (
+  orderId: string,
+): Promise<{ ok: boolean; message?: string }> => {
+  const user = await getCurrentUser();
+
+  if (!user) return { ok: false, message: "Please sign in first" };
+  if (dashboardRole(user.role) !== "customer") {
+    return { ok: false, message: "Only customers can cancel their orders" };
+  }
+  if (!orderId) return { ok: false, message: "Missing order id" };
+
+  try {
+    const res = await fetch(
+      `${BASE_URL}/api/orders/${encodeURIComponent(orderId)}/cancel`,
+      {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        // customerId সেশন থেকে আসছে, তাই অন্যের অর্ডার cancel করা যাবে না
+        body: JSON.stringify({ customerId: user.id }),
+      },
+    );
+
+    if (!res.ok) {
+      const body = (await res.json().catch(() => null)) as {
+        message?: string;
+      } | null;
+
+      return {
+        ok: false,
+        message: body?.message ?? `Could not cancel the order (${res.status})`,
+      };
+    }
+
+    revalidatePath("/dashboard/customer/orders");
+    revalidatePath("/dashboard/vendor/orders");
+    return { ok: true };
+  } catch (error) {
+    return {
+      ok: false,
+      message: error instanceof Error ? error.message : "Network error",
+    };
+  }
+};

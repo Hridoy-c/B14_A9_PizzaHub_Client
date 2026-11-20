@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { CalendarDays, ImageOff, MapPin, MessageSquare } from "lucide-react";
 import OrderStatusBadge from "./OrderStatusBadge";
+import CancelOrderButton from "./CancelOrderButton";
 import { categoryLabel } from "@/lib/utils/menu";
 import type { Order } from "@/lib/types";
 
@@ -79,19 +80,25 @@ const OrderCard = ({ order }: { order: Order }) => {
           ) : null}
         </ul>
 
-        <div className="mt-auto flex items-center justify-between gap-3 pt-4">
+        <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-4">
           <p className="font-display text-[1.25rem] leading-none tracking-tight text-[#7A2E12]">
             {typeof item?.price === "number" ? `$${item.price.toFixed(2)}` : "—"}
           </p>
 
-          {item ? (
-            <Link
-              href={`/menu/${order.itemId}`}
-              className="rounded-full border border-[#3B2417] px-4 py-2 font-sans text-[0.875rem] text-[#3B2417] transition-colors hover:bg-[#3B2417] hover:text-[#F5EDE3]"
-            >
-              View item
-            </Link>
-          ) : null}
+          <div className="flex items-start gap-3">
+            {order.status === "pending" ? (
+              <CancelOrderButton orderId={order._id} />
+            ) : null}
+
+            {item ? (
+              <Link
+                href={`/menu/${order.itemId}`}
+                className="rounded-full border border-[#3B2417] px-4 py-2 font-sans text-[0.875rem] text-[#3B2417] transition-colors hover:bg-[#3B2417] hover:text-[#F5EDE3]"
+              >
+                View item
+              </Link>
+            ) : null}
+          </div>
         </div>
       </div>
     </li>
