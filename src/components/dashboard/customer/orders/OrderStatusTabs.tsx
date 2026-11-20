@@ -5,9 +5,10 @@ type Props = {
   active: OrderStatus | "all";
   total: number;
   counts: Record<OrderStatus, number>;
+  basePath?: string;
 };
 
-const OrderStatusTabs = ({ active, total, counts }: Props) => {
+const OrderStatusTabs = ({ active, total, counts, basePath = "/dashboard/customer/orders", }: Props) => {
   const tabs = ["all", ...ORDER_STATUSES] as const;
 
   return (
@@ -22,11 +23,7 @@ const OrderStatusTabs = ({ active, total, counts }: Props) => {
         return (
           <Link
             key={tab}
-            href={
-              tab === "all"
-                ? "/dashboard/customer/orders"
-                : `/dashboard/customer/orders?status=${tab}`
-            }
+                       href={tab === "all" ? basePath : `${basePath}?status=${tab}`}
             aria-current={selected ? "page" : undefined}
             className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 capitalize transition-colors ${
               selected

@@ -72,3 +72,48 @@ export const createOrder = async (
     };
   }
 };
+
+
+export const setOrderStatus = async (
+  orderId: string,
+  status: "accepted" | "rejected",
+): Promise<{ ok: boolean; message?: string }> => {
+  const user = await getCurrentUser();
+
+  if (!user || dashboardRole(user.role) !== "vendor") {
+    return { ok: false, message: "Only vendors can update orders" };
+  }
+  if (!orderId) return { ok: false, message: "Missing order id" };
+
+  try {
+    const res = await fetch(
+      `${BASE_URL}/api/orders/${encodeURIComponent(orderId)}/status`,
+      {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        // vendorId comes from the session, so a vendor can only update their own orders.
+        body: JSON.stringify({ status, vendorId: user.id }),
+      },
+    );
+
+    if (!res.ok) {
+      const body = (await res.json().catch(() => null)) as {
+        message?: string;
+      } | null;
+
+      return {
+        ok: false,
+        message: body?.message ?? `Could not update the order (${res.status})`,
+      };
+    }
+
+    revalidatePath("/dashboard/vendor/orders");
+    revalidatePath("/dashboard/customer/orders");
+    return { ok: true };
+  } catch (error) {
+    return {
+      ok: false,
+      message: error instanceof Error ? error.message : "Network error",
+    };
+  }
+};

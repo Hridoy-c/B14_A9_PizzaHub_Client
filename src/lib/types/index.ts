@@ -92,6 +92,7 @@ export type Order = {
   createdAt: string;
   /** Joined from menuItems; missing if the item was deleted. */
   item?: {
+    customer?: { name: string; email: string; image?: string | null };
     name: string;
     image?: string;
     images?: string[];
