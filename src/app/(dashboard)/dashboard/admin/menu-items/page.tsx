@@ -79,11 +79,8 @@ const MenuItemsContent = async ({ searchParams }: PageProps) => {
 
   const active: Filter = filters.find((f) => f === status) ?? "all";
 
-  // Get current request cookie
-  const cookie = (await headers()).get("cookie") ?? "";
-
   // Fetch all menu items
-  const items = await getAllMenuForAdmin(undefined, cookie);
+  const items = await getAllMenuForAdmin();
 
   // Initialize status counts
   const counts: Record<MenuItemStatus, number> = {

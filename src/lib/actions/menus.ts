@@ -1,47 +1,46 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { protectedMutation } from "../cors/server";
+import { apiFetch } from "../cors/api";
 import { requireUser } from "@/lib/cors/Session";
 import { dashboardHome, dashboardRole } from "@/lib/roles";
 import type { AddItemPayload } from "../types";
-
-const BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
 type ActionResponse = {
   ok: boolean;
   message?: string;
 };
 
+const readMessage = async (res: Response) => {
+  const body = (await res.json().catch(() => null)) as {
+    message?: string;
+  } | null;
+
+  return body?.message;
+};
+
 export const createPizzaPost = async (
   data: AddItemPayload,
 ): Promise<ActionResponse> => {
   try {
-    const res = await protectedMutation(
-      `${BASE_URL}/api/menu`,
-      "POST",
-      data,
-    );
+    const res = await apiFetch("/api/menu", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
 
-    const body = await res.json().catch(() => null);
+    const message = await readMessage(res);
 
     if (!res.ok) {
       return {
         ok: false,
-        message:
-          body?.message ?? `Could not create the item (${res.status})`,
+        message: message ?? `Could not create the item (${res.status})`,
       };
     }
 
     revalidatePath("/dashboard/vendor/menu");
 
-    return {
-      ok: true,
-      message: body?.message ?? "Menu item created successfully",
-    };
+    return { ok: true, message: message ?? "Menu item created successfully" };
   } catch (error) {
     console.error("Create menu item error:", error);
 
@@ -55,8 +54,7 @@ export const createPizzaPost = async (
 export const setMenuItemStatus = async (
   id: string,
   status: "approved" | "rejected",
-): Promise<{ ok: boolean; message?: string }> => {
-  // The API also checks this, but fail fast before leaving the app.
+): Promise<ActionResponse> => {
   const user = await requireUser();
   if (dashboardRole(user.role) !== "admin") {
     redirect(dashboardHome(user.role));
@@ -65,30 +63,23 @@ export const setMenuItemStatus = async (
   if (!id) return { ok: false, message: "Missing item id" };
 
   try {
-    const res = await fetch(
-      `${BASE_URL}/api/admin/menu/${encodeURIComponent(id)}/status`,
+    const res = await apiFetch(
+      `/api/admin/menu/${encodeURIComponent(id)}/status`,
       {
         method: "PATCH",
-        headers: {
-          "content-type": "application/json",
-          cookie: (await headers()).get("cookie") ?? "",
-        },
         body: JSON.stringify({ status }),
       },
     );
 
     if (!res.ok) {
-      const body = (await res.json().catch(() => null)) as {
-        message?: string;
-      } | null;
+      const message = await readMessage(res);
 
       return {
         ok: false,
-        message: body?.message ?? `Could not update the item (${res.status})`,
+        message: message ?? `Could not update the item (${res.status})`,
       };
     }
 
-    // The admin list changes, and approved items appear on the public menu.
     revalidatePath("/dashboard/admin/menu-items");
     revalidatePath("/menu");
     revalidatePath("/");
@@ -102,20 +93,14 @@ export const setMenuItemStatus = async (
   }
 };
 
-
-type MutationResult = { ok: boolean; message?: string };
-
-
-
 const callMenuItem = async (
   id: string,
   method: "PATCH" | "DELETE",
   payload?: Record<string, unknown>,
-): Promise<MutationResult> => {
+): Promise<ActionResponse> => {
   const user = await requireUser();
   const role = dashboardRole(user.role);
 
-  // The API also checks this, but fail fast before leaving the app.
   if (role !== "vendor" && role !== "admin") {
     return { ok: false, message: "You are not allowed to do that." };
   }
@@ -123,23 +108,17 @@ const callMenuItem = async (
   if (!id) return { ok: false, message: "Missing item id" };
 
   try {
-    const res = await fetch(`${BASE_URL}/api/menu/${encodeURIComponent(id)}`, {
+    const res = await apiFetch(`/api/menu/${encodeURIComponent(id)}`, {
       method,
-      headers: {
-        "content-type": "application/json",
-        cookie: (await headers()).get("cookie") ?? "",
-      },
       ...(payload ? { body: JSON.stringify(payload) } : {}),
     });
 
-    const body = (await res.json().catch(() => null)) as {
-      message?: string;
-    } | null;
+    const message = await readMessage(res);
 
     if (!res.ok) {
       return {
         ok: false,
-        message: body?.message ?? `Request failed (${res.status})`,
+        message: message ?? `Request failed (${res.status})`,
       };
     }
 
@@ -147,9 +126,10 @@ const callMenuItem = async (
     revalidatePath("/menu");
     revalidatePath("/");
 
-    return { ok: true, message: body?.message };
+    return { ok: true, message };
   } catch (error) {
     console.error(`Menu item ${method} error:`, error);
+
     return {
       ok: false,
       message: "Could not reach the server. Is the API running?",
@@ -160,8 +140,8 @@ const callMenuItem = async (
 export const updateMenuItemAction = async (
   id: string,
   data: { name: string; description: string; price: number },
-): Promise<MutationResult> => callMenuItem(id, "PATCH", data);
+): Promise<ActionResponse> => callMenuItem(id, "PATCH", data);
 
 export const deleteMenuItemAction = async (
   id: string,
-): Promise<MutationResult> => callMenuItem(id, "DELETE");
+): Promise<ActionResponse> => callMenuItem(id, "DELETE");

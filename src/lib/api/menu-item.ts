@@ -1,9 +1,9 @@
 import type { MenuItem, MenuItemStatus } from "../types";
+import { apiFetch } from "../cors/api";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
-/** APIs return either a bare array or `{ data: [...] }`. */
 const toList = (json: unknown): MenuItem[] => {
   if (Array.isArray(json)) return json as MenuItem[];
 
@@ -41,7 +41,6 @@ export const getPizzas = async (
   }
 };
 
-/** A single menu item, or `null` when the id does not exist. */
 export const getPizzasById = async (id: string): Promise<MenuItem | null> => {
   try {
     const res = await fetch(`${BASE_URL}/api/menu/${encodeURIComponent(id)}`, {
@@ -60,7 +59,6 @@ export const getPizzasById = async (id: string): Promise<MenuItem | null> => {
   }
 };
 
-/** Public vendor page: approved items only. */
 export const getMenuByVendor = async (
   vendorId: string,
 ): Promise<MenuItem[]> => {
@@ -77,15 +75,10 @@ export const getMenuByVendor = async (
   }
 };
 
-/**
- * Vendor dashboard: every item the given vendor owns, including pending
- * and rejected ones. The page passes the id of the signed-in vendor.
- */
 export const getMyMenu = async (vendorId: string): Promise<MenuItem[]> => {
   try {
-    const res = await fetch(
-      `${BASE_URL}/api/vendor/menu?vendorId=${encodeURIComponent(vendorId)}`,
-      { cache: "no-store" },
+    const res = await apiFetch(
+      `/api/vendor/menu?vendorId=${encodeURIComponent(vendorId)}`,
     );
     if (!res.ok) return [];
 
@@ -95,17 +88,12 @@ export const getMyMenu = async (vendorId: string): Promise<MenuItem[]> => {
   }
 };
 
-/** Admin dashboard: every menu item, optionally filtered by status. */
 export const getAllMenuForAdmin = async (
   status?: MenuItemStatus,
-  cookie = "",
 ): Promise<MenuItem[]> => {
   try {
     const query = status ? `?status=${encodeURIComponent(status)}` : "";
-    const res = await fetch(`${BASE_URL}/api/admin/menu${query}`, {
-      cache: "no-store",
-      headers: { cookie },
-    });
+    const res = await apiFetch(`/api/admin/menu${query}`);
     if (!res.ok) return [];
 
     return toList(await res.json());
@@ -113,8 +101,6 @@ export const getAllMenuForAdmin = async (
     return [];
   }
 };
-
-
 
 export const getMenuCount = async (
   params: { vendorId?: string; status?: string[] } = {},
@@ -124,9 +110,7 @@ export const getMenuCount = async (
     if (params.vendorId) search.set("vendorId", params.vendorId);
     if (params.status?.length) search.set("status", params.status.join(","));
 
-    const res = await fetch(`${BASE_URL}/api/menu/count?${search}`, {
-      cache: "no-store",
-    });
+    const res = await apiFetch(`/api/menu/count?${search}`);
     if (!res.ok) return { count: 0 };
 
     return await res.json();

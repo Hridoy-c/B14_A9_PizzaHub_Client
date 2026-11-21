@@ -1,5 +1,4 @@
-const BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+import { apiFetch } from "../cors/api";
 
 export type AdminUser = {
   _id: string;
@@ -9,15 +8,9 @@ export type AdminUser = {
   createdAt: string;
 };
 
-/** Admin dashboard: every registered user. */
-export const getAllUsersForAdmin = async (
-  cookie = "",
-): Promise<AdminUser[]> => {
+export const getAllUsersForAdmin = async (): Promise<AdminUser[]> => {
   try {
-    const res = await fetch(`${BASE_URL}/api/admin/users`, {
-      cache: "no-store",
-      headers: { cookie },
-    });
+    const res = await apiFetch("/api/admin/users");
     if (!res.ok) return [];
 
     const json = await res.json();

@@ -1,55 +1,49 @@
 import type { Order } from "../types";
+import { apiFetch } from "../cors/api";
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+const toList = (json: unknown): Order[] => {
+  if (Array.isArray(json)) return json as Order[];
+
+  const data = (json as { data?: unknown } | null)?.data;
+  return Array.isArray(data) ? (data as Order[]) : [];
+};
 
 export const getOrdersByCustomer = async (
   customerId: string,
 ): Promise<Order[]> => {
   try {
-    const res = await fetch(
-      `${BASE_URL}/api/orders/customer/${encodeURIComponent(customerId)}`,
-      { cache: "no-store" },
+    const res = await apiFetch(
+      `/api/orders/customer/${encodeURIComponent(customerId)}`,
     );
     if (!res.ok) return [];
 
-    const json = await res.json();
-    return Array.isArray(json) ? json : (json.data ?? []);
+    return toList(await res.json());
   } catch {
     return [];
   }
 };
-
 
 export const getOrdersByVendor = async (
   vendorId: string,
 ): Promise<Order[]> => {
   try {
-    const res = await fetch(
-      `${BASE_URL}/api/orders/vendor/${encodeURIComponent(vendorId)}`,
-      { cache: "no-store" },
+    const res = await apiFetch(
+      `/api/orders/vendor/${encodeURIComponent(vendorId)}`,
     );
     if (!res.ok) return [];
 
-    const json = await res.json();
-    return Array.isArray(json) ? json : (json.data ?? []);
+    return toList(await res.json());
   } catch {
     return [];
   }
 };
 
-
-/** Admin dashboard: every order on the platform. */
-export const getAllOrdersForAdmin = async (cookie = ""): Promise<Order[]> => {
+export const getAllOrdersForAdmin = async (): Promise<Order[]> => {
   try {
-    const res = await fetch(`${BASE_URL}/api/admin/orders`, {
-      cache: "no-store",
-      headers: { cookie },
-    });
+    const res = await apiFetch("/api/admin/orders");
     if (!res.ok) return [];
 
-    const json = await res.json();
-    return Array.isArray(json) ? json : (json.data ?? []);
+    return toList(await res.json());
   } catch {
     return [];
   }

@@ -185,12 +185,10 @@ const EmptyNote = ({ children }: { children: React.ReactNode }) => (
 const AdminOverviewPage = async () => {
   const user = await requireUser();
 
-  const cookie = (await headers()).get("cookie") ?? "";
-
   const [orders, users, menu] = await Promise.all([
-    getAllOrdersForAdmin(cookie),
-    getAllUsersForAdmin(cookie),
-    getAllMenuForAdmin(undefined, cookie),
+    getAllOrdersForAdmin(),
+    getAllUsersForAdmin(),
+    getAllMenuForAdmin(),
   ]);
 
   const today = startOfUtcDay(new Date());

@@ -25,7 +25,7 @@ export async function POST(request: Request) {
       mode: "payment",
       customer_email: user.email,
       client_reference_id: user.id,
-      metadata: { userId: user.id },
+      metadata: { userId: user.id, userName: user.name },
       success_url: `${origin}/dashboard/vendor/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/dashboard/vendor/subscription`,
       integration_identifier: "pizza_hub_web_001",

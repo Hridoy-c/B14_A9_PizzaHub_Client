@@ -102,3 +102,19 @@ export type Order = {
     vendorName?: string;
   };
 };
+
+
+export type Transaction = {
+  _id: string;
+  sessionId: string;
+  status: string;
+  payment_status: string;
+  customer_email?: string;
+  userId: string;
+  userName?: string;
+  payment_date: string;
+  payment_intent?: string;
+  amount?: number;
+  currency?: string;
+  user?: { name?: string | null; email?: string; image?: string | null };
+};

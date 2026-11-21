@@ -1,22 +1,33 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { apiFetch } from "../cors/api";
 import { getCurrentUser } from "@/lib/cors/Session";
 import { dashboardRole } from "@/lib/roles";
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+type ActionResponse = {
+  ok: boolean;
+  message?: string;
+};
 
 export type CreateOrderInput = {
   itemId: string;
-  deliveryDate: string; // YYYY-MM-DD
+  deliveryDate: string;
   deliveryAddress: string;
   message: string;
 };
 
+const readMessage = async (res: Response) => {
+  const body = (await res.json().catch(() => null)) as {
+    message?: string;
+  } | null;
+
+  return body?.message;
+};
+
 export const createOrder = async (
   input: CreateOrderInput,
-): Promise<{ ok: boolean; message?: string }> => {
+): Promise<ActionResponse> => {
   const user = await getCurrentUser();
 
   if (!user) return { ok: false, message: "Please sign in to place an order" };
@@ -40,12 +51,10 @@ export const createOrder = async (
   }
 
   try {
-    const res = await fetch(`${BASE_URL}/api/orders`, {
+    const res = await apiFetch("/api/orders", {
       method: "POST",
-      headers: { "content-type": "application/json" },
       body: JSON.stringify({
         itemId: input.itemId,
-        customerId: user.id, // from the session, never from the browser
         deliveryDate: input.deliveryDate,
         deliveryAddress,
         message,
@@ -53,13 +62,11 @@ export const createOrder = async (
     });
 
     if (!res.ok) {
-      const body = (await res.json().catch(() => null)) as {
-        message?: string;
-      } | null;
+      const error = await readMessage(res);
 
       return {
         ok: false,
-        message: body?.message ?? `Could not place the order (${res.status})`,
+        message: error ?? `Could not place the order (${res.status})`,
       };
     }
 
@@ -73,11 +80,10 @@ export const createOrder = async (
   }
 };
 
-
 export const setOrderStatus = async (
   orderId: string,
   status: "accepted" | "rejected",
-): Promise<{ ok: boolean; message?: string }> => {
+): Promise<ActionResponse> => {
   const user = await getCurrentUser();
 
   if (!user || dashboardRole(user.role) !== "vendor") {
@@ -86,24 +92,20 @@ export const setOrderStatus = async (
   if (!orderId) return { ok: false, message: "Missing order id" };
 
   try {
-    const res = await fetch(
-      `${BASE_URL}/api/orders/${encodeURIComponent(orderId)}/status`,
+    const res = await apiFetch(
+      `/api/orders/${encodeURIComponent(orderId)}/status`,
       {
         method: "PATCH",
-        headers: { "content-type": "application/json" },
-        // vendorId comes from the session, so a vendor can only update their own orders.
-        body: JSON.stringify({ status, vendorId: user.id }),
+        body: JSON.stringify({ status }),
       },
     );
 
     if (!res.ok) {
-      const body = (await res.json().catch(() => null)) as {
-        message?: string;
-      } | null;
+      const error = await readMessage(res);
 
       return {
         ok: false,
-        message: body?.message ?? `Could not update the order (${res.status})`,
+        message: error ?? `Could not update the order (${res.status})`,
       };
     }
 
@@ -118,10 +120,9 @@ export const setOrderStatus = async (
   }
 };
 
-
 export const cancelOrder = async (
   orderId: string,
-): Promise<{ ok: boolean; message?: string }> => {
+): Promise<ActionResponse> => {
   const user = await getCurrentUser();
 
   if (!user) return { ok: false, message: "Please sign in first" };
@@ -131,24 +132,17 @@ export const cancelOrder = async (
   if (!orderId) return { ok: false, message: "Missing order id" };
 
   try {
-    const res = await fetch(
-      `${BASE_URL}/api/orders/${encodeURIComponent(orderId)}/cancel`,
-      {
-        method: "PATCH",
-        headers: { "content-type": "application/json" },
-        // customerId সেশন থেকে আসছে, তাই অন্যের অর্ডার cancel করা যাবে না
-        body: JSON.stringify({ customerId: user.id }),
-      },
+    const res = await apiFetch(
+      `/api/orders/${encodeURIComponent(orderId)}/cancel`,
+      { method: "PATCH" },
     );
 
     if (!res.ok) {
-      const body = (await res.json().catch(() => null)) as {
-        message?: string;
-      } | null;
+      const error = await readMessage(res);
 
       return {
         ok: false,
-        message: body?.message ?? `Could not cancel the order (${res.status})`,
+        message: error ?? `Could not cancel the order (${res.status})`,
       };
     }
 

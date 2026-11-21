@@ -1,5 +1,6 @@
-const BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+"use server";
+
+import { apiFetch } from "../cors/api";
 
 type CheckoutVerifyResult = {
   success: boolean;
@@ -11,14 +12,12 @@ export const checkoutVerify = async (
   sessionId: string,
 ): Promise<CheckoutVerifyResult> => {
   try {
-    const response = await fetch(`${BASE_URL}/payments/checkout-verify`, {
+    const res = await apiFetch("/payments/checkout-verify", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ sessionId }),
-      cache: "no-store",
     });
 
-    return await response.json();
+    return await res.json();
   } catch {
     return { success: false, message: "Could not reach the payment service." };
   }
@@ -28,13 +27,12 @@ export const getPlanStatus = async (
   userId: string,
 ): Promise<{ premium: boolean }> => {
   try {
-    const response = await fetch(
-      `${BASE_URL}/payments/status?userId=${encodeURIComponent(userId)}`,
-      { cache: "no-store" },
+    const res = await apiFetch(
+      `/payments/status?userId=${encodeURIComponent(userId)}`,
     );
-    if (!response.ok) return { premium: false };
+    if (!res.ok) return { premium: false };
 
-    return await response.json();
+    return await res.json();
   } catch {
     return { premium: false };
   }
