@@ -120,8 +120,9 @@ const SignUpForm = () => {
         },
       });
 
-      router.push("/");
-
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 800);
       form.reset();
       setPassword("");
       resetImage();
