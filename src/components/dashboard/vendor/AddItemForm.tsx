@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Check, ImagePlus, Loader2, MapPin } from "lucide-react";
@@ -13,11 +14,7 @@ import {
 } from "@/lib/types";
 import { authClient } from "@/lib/auth-client";
 
-/* ---------- Config ---------- */
-
 const MAX_DESCRIPTION = 400;
-
-/* ---------- Shared styles ---------- */
 
 const cardClass = "rounded-3xl border border-[#EADBC8] bg-[#FBF6EF] p-5 sm:p-7";
 const cardTitleClass =
@@ -26,8 +23,6 @@ const cardHintClass = "mt-2 text-[0.9375rem] leading-relaxed text-[#7A6455]";
 const labelClass = "font-sans text-[0.9375rem] text-[#3B2417]";
 const fieldClass =
   "h-12 w-full rounded-xl border border-[#EADBC8] bg-white px-4 text-[1rem] text-[#2A1A10] outline-none transition placeholder:text-[#A08C7B] focus:border-[#B9733A] focus:ring-4 focus:ring-[#B9733A]/15 disabled:cursor-not-allowed disabled:opacity-60";
-
-/* ---------- Small building block ---------- */
 
 const Field = ({
   label,
@@ -53,9 +48,13 @@ const Field = ({
   </div>
 );
 
-/* ---------- Form ---------- */
+type AddItemFormProps = {
+  activeCount: number;
+  isPremium: boolean;
+  limit: number;
+};
 
-const AddItemForm = () => {
+const AddItemForm = ({ activeCount, isPremium, limit }: AddItemFormProps) => {
   const router = useRouter();
 
   const [name, setName] = useState("");
@@ -66,6 +65,8 @@ const AddItemForm = () => {
   const [images, setImages] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const atLimit = !isPremium && activeCount >= limit;
 
   const priceNumber = Number(price);
   const priceValid =
@@ -93,6 +94,12 @@ const AddItemForm = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    if (atLimit) {
+      return toast.error("Free plan limit reached", {
+        description: `You can have up to ${limit} active items. Upgrade to add more.`,
+      });
+    }
+
     const cleanName = name.trim();
     const cleanDescription = description.trim();
     const cleanLocation = location.trim();
@@ -117,7 +124,6 @@ const AddItemForm = () => {
       });
     }
 
-    // Vendor details come from the signed-in user, never from the form.
     const { data: session } = await authClient.getSession();
     const user = session?.user;
 
@@ -126,6 +132,7 @@ const AddItemForm = () => {
         description: "Please sign in to create a menu item.",
       });
     }
+
     const postData: AddItemPayload = {
       name: cleanName,
       category,
@@ -138,17 +145,25 @@ const AddItemForm = () => {
       vendorName: user.name,
       vendorEmail: user.email,
       vendorImage: user.image ?? null,
-      status: "pending", // vendor নতুন item বানালে সবসময় pending
+      status: "pending",
     };
 
     setIsSubmitting(true);
     const loadingToast = toast.loading("Creating menu item…");
 
     try {
-      // await is required, otherwise errors are never caught here.
       const res = await createPizzaPost(postData);
       if (!res.ok) {
         toast.dismiss(loadingToast);
+
+        if (res.message?.startsWith("Free plan limit")) {
+          toast.error("Free plan limit reached", {
+            description: "Redirecting you to the payment page…",
+          });
+          router.push("/dashboard/vendor/subscription");
+          return;
+        }
+
         toast.error("Could not create the item", { description: res.message });
         return;
       }
@@ -176,7 +191,33 @@ const AddItemForm = () => {
       noValidate
       className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_380px]"
     >
-      {/* ---------- Left column: details ---------- */}
+      {!isPremium ? (
+        <div
+          className={`flex flex-wrap items-center justify-between gap-3 rounded-2xl border px-5 py-4 lg:col-span-2 ${
+            atLimit
+              ? "border-[#E0A93B] bg-[#FBF1DC]"
+              : "border-[#EADBC8] bg-[#FBF6EF]"
+          }`}
+        >
+          <div>
+            <p className="font-sans text-[0.9375rem] font-medium text-[#3B2417]">
+              Free plan: {Math.min(activeCount, limit)} of {limit} items used
+            </p>
+            <p className="text-[0.8125rem] text-[#7A6455]">
+              {atLimit
+                ? "You have reached the limit. Upgrade to Premium to add unlimited items."
+                : "Upgrade to Premium for unlimited menu items."}
+            </p>
+          </div>
+          <Link
+            href="/dashboard/vendor/subscription"
+            className="rounded-full bg-[#3B2417] px-5 py-2 font-sans text-[0.875rem] font-medium text-[#F5EDE3] transition-colors hover:bg-[#2A1A10]"
+          >
+            Upgrade
+          </Link>
+        </div>
+      ) : null}
+
       <section className={cardClass} aria-labelledby="details-heading">
         <h2 id="details-heading" className={cardTitleClass}>
           Item details
@@ -296,7 +337,6 @@ const AddItemForm = () => {
         </div>
       </section>
 
-      {/* ---------- Right column: photos + publish ---------- */}
       <div className="flex flex-col gap-6 lg:sticky lg:top-6">
         <section className={cardClass} aria-labelledby="photos-heading">
           <h2 id="photos-heading" className={cardTitleClass}>
@@ -370,7 +410,7 @@ const AddItemForm = () => {
 
           <button
             type="submit"
-            disabled={isSubmitting || isUploading}
+            disabled={isSubmitting || isUploading || atLimit}
             aria-busy={isSubmitting}
             className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#3B2417] px-6 font-sans text-[1rem] text-[#F5EDE3] shadow-[0_10px_24px_-8px_rgba(59,36,23,0.55)] transition-all hover:-translate-y-0.5 hover:bg-[#2A1A10] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#B9733A]/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:bg-[#3B2417]"
           >

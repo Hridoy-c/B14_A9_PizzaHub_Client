@@ -113,3 +113,24 @@ export const getAllMenuForAdmin = async (
     return [];
   }
 };
+
+
+
+export const getMenuCount = async (
+  params: { vendorId?: string; status?: string[] } = {},
+): Promise<{ count: number }> => {
+  try {
+    const search = new URLSearchParams();
+    if (params.vendorId) search.set("vendorId", params.vendorId);
+    if (params.status?.length) search.set("status", params.status.join(","));
+
+    const res = await fetch(`${BASE_URL}/api/menu/count?${search}`, {
+      cache: "no-store",
+    });
+    if (!res.ok) return { count: 0 };
+
+    return await res.json();
+  } catch {
+    return { count: 0 };
+  }
+};

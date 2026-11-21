@@ -35,6 +35,12 @@ export const auth = betterAuth({
         defaultValue: "customer",
         input: true,
       },
+      premium: {
+      type: "boolean",
+      defaultValue: false,
+      input: false,
+    },
+     
     },
     changeEmail: {
       enabled: true,

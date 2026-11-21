@@ -16,10 +16,25 @@ const BuyPlanButton = ({ price }: { price: number }) => {
 
   const handleBuy = async () => {
     setError(null);
+    setLoading(true);
 
-    // TODO: implement the purchase here.
-    // Use setLoading(true / false) around your request and
-    // setError("message") to show a problem under the button.
+    try {
+      const res = await fetch("/api/checkout_sessions", { method: "POST" });
+      const data = await res.json();
+
+      if (!res.ok || !data.url) {
+        throw new Error(data.error ?? "Could not start checkout.");
+      }
+
+      window.location.href = data.url;
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again.",
+      );
+      setLoading(false);
+    }
   };
 
   return (

@@ -1,5 +1,6 @@
 
 import React from "react";
+import { connection } from "next/server";
 
 import Footer from "@/components/shared/footer/Footer";
 import Navbar from "@/components/shared/navbar/Navbar";
@@ -16,6 +17,11 @@ const RootLayout = async ({
 }: {
   children: React.ReactNode;
 }) => {
+  // The session read (Better Auth) checks expiry with `new Date()`, so it must
+  // only run at request time. Without this, prerendering throws
+  // "encountered the unstable value `new Date()` while prerendering".
+  await connection();
+
   const user = await getCurrentUser();
 
   return (

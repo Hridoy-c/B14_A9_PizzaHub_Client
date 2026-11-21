@@ -1,17 +1,16 @@
 import { BadgeCheck, Check, ShieldCheck } from "lucide-react";
 import { requireUser } from "@/lib/cors/Session";
+import { getPlanStatus } from "@/lib/actions/payment";
 import BuyPlanButton from "@/components/dashboard/vendor/subscription/BuyPlanButton";
 
-// Reads the session, so it cannot be prerendered.
 export const instant = false;
 
-// Edit these to match your real plan.
 const PLAN = {
   name: "Vendor Plan",
   price: 49,
   tagline: "One payment. No renewals, no monthly fees.",
   features: [
-    "Publish menu items to the PizzaHub marketplace",
+    "Unlimited menu items on the PizzaHub marketplace",
     "Receive and manage customer orders",
     "Vendor dashboard with order and revenue summary",
     "Email support",
@@ -27,19 +26,17 @@ const money = (n: number) =>
 const VendorSubscriptionPage = async () => {
   const user = await requireUser();
 
-  // TODO: replace with the real value from your API.
-  const hasPurchased = false;
+  const { premium: hasPurchased } = await getPlanStatus(user.id);
 
   return (
     <section className="flex flex-col gap-8">
-      {/* Header */}
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="font-display text-[clamp(1.75rem,1.4rem+1vw,2.5rem)] leading-none tracking-tight text-[#3B2417]">
             Subscription
           </h1>
           <p className="mt-2 max-w-[56ch] text-[0.9375rem] leading-relaxed text-[#7A6455]">
-            Unlock your vendor account with a single payment.
+            Unlock unlimited menu items with a single payment.
           </p>
         </div>
 
@@ -53,12 +50,11 @@ const VendorSubscriptionPage = async () => {
           {hasPurchased ? (
             <BadgeCheck className="size-4" aria-hidden="true" />
           ) : null}
-          {hasPurchased ? "Plan active" : "No active plan"}
+          {hasPurchased ? "Plan active" : "Free plan"}
         </span>
       </header>
 
       <div className="grid items-start gap-6 lg:grid-cols-[1.3fr_1fr]">
-        {/* Plan details */}
         <article className="flex flex-col gap-6 rounded-2xl border border-[#EADBC8] bg-[#FBF6EF] p-6">
           <div className="flex flex-col gap-1">
             <div className="flex items-center justify-between gap-3">
@@ -101,7 +97,6 @@ const VendorSubscriptionPage = async () => {
           </div>
         </article>
 
-        {/* Order summary */}
         <aside className="flex flex-col gap-5 rounded-2xl border border-[#EADBC8] bg-[#FBF6EF] p-6 lg:sticky lg:top-6">
           <h2 className="font-sans text-[0.9375rem] font-semibold text-[#3B2417]">
             Order summary
