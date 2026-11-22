@@ -2,8 +2,26 @@ import { betterAuth } from "better-auth";
 import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { admin, jwt } from "better-auth/plugins";
+import { attachDatabasePool } from "@vercel/functions";
 
-const client = new MongoClient(process.env.MONGODB_URI || "");
+const uri = process.env.MONGODB_URI;
+if (!uri) throw new Error("MONGODB_URI is not set");
+
+// একই client বারবার ব্যবহার হবে, hot reload বা নতুন instance-এ আবার বানানো হবে না।
+const globalForMongo = globalThis as unknown as { _mongoClient?: MongoClient };
+
+const client =
+  globalForMongo._mongoClient ??
+  new MongoClient(uri, {
+    maxIdleTimeMS: 5000,
+    serverSelectionTimeoutMS: 10000,
+  });
+
+globalForMongo._mongoClient = client;
+
+// Vercel-কে জানায় function idle হলে pool ঠিকমতো বন্ধ করতে।
+attachDatabasePool(client);
+
 const db = client.db("Pizza_hub");
 
 export const auth = betterAuth({
@@ -36,11 +54,10 @@ export const auth = betterAuth({
         input: true,
       },
       premium: {
-      type: "boolean",
-      defaultValue: false,
-      input: false,
-    },
-     
+        type: "boolean",
+        defaultValue: false,
+        input: false,
+      },
     },
     changeEmail: {
       enabled: true,
