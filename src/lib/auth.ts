@@ -2,25 +2,22 @@ import { betterAuth } from "better-auth";
 import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { admin, jwt } from "better-auth/plugins";
-import { attachDatabasePool } from "@vercel/functions";
 
 const uri = process.env.MONGODB_URI;
 if (!uri) throw new Error("MONGODB_URI is not set");
 
-// একই client বারবার ব্যবহার হবে, hot reload বা নতুন instance-এ আবার বানানো হবে না।
+// একই client সব request-এ ব্যবহার হবে। কেউ এটা close করবে না।
 const globalForMongo = globalThis as unknown as { _mongoClient?: MongoClient };
 
 const client =
   globalForMongo._mongoClient ??
   new MongoClient(uri, {
-    maxIdleTimeMS: 5000,
+    maxPoolSize: 10,
     serverSelectionTimeoutMS: 10000,
   });
 
+// production-এও cache রাখুন, শুধু dev-এ নয়।
 globalForMongo._mongoClient = client;
-
-// Vercel-কে জানায় function idle হলে pool ঠিকমতো বন্ধ করতে।
-attachDatabasePool(client);
 
 const db = client.db("Pizza_hub");
 
@@ -38,7 +35,6 @@ export const auth = betterAuth({
   },
   emailAndPassword: {
     enabled: true,
-    // Matches the form's "Minimum 6 characters" rule.
     minPasswordLength: 6,
   },
   user: {
@@ -46,7 +42,6 @@ export const auth = betterAuth({
       enabled: true,
     },
     additionalFields: {
-      // Sent by the sign-up form; the hook below turns it into `role`.
       accountType: {
         type: "string",
         required: false,
@@ -61,8 +56,6 @@ export const auth = betterAuth({
     },
     changeEmail: {
       enabled: true,
-      // Email/password accounts are unverified, so let them switch address
-      // without an SMTP provider. Verified social accounts still need one.
       updateEmailWithoutVerification: true,
     },
   },
@@ -76,7 +69,6 @@ export const auth = betterAuth({
           return {
             data: {
               ...user,
-              // Only customer or vendor can be self-selected. Never admin.
               role: accountType === "vendor" ? "vendor" : "customer",
             },
           };
