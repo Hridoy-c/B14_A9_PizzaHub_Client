@@ -17,7 +17,7 @@ const NewMenuItemPage = async () => {
   const { premium: isPremium } = await getPlanStatus(user.id);
 
   return (
-    <section className="flex flex-col gap-8">
+    <section className="flex min-w-0 flex-col gap-8">
       <header>
         <h1 className="font-display text-[clamp(1.75rem,1.4rem+1vw,2.5rem)] leading-none tracking-tight text-[#3B2417]">
           Add menu item

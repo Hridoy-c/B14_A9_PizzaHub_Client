@@ -23,11 +23,11 @@ const toolbarClass =
 const ToolbarSkeleton = () => (
   <div aria-busy="true" className={toolbarClass}>
     <div className="h-[3.25rem] animate-pulse rounded-full bg-[#EADBC8]" />
-    <div className="flex gap-2">
+    <div className="flex flex-wrap gap-2">
       {[0, 1, 2, 3].map((i) => (
         <div
           key={i}
-          className="h-9 w-28 animate-pulse rounded-full bg-[#EADBC8]"
+          className="h-9 w-24 animate-pulse rounded-full bg-[#EADBC8] sm:w-28"
         />
       ))}
     </div>
@@ -112,11 +112,11 @@ const MenuSections = async ({ searchParams }: PageProps) => {
           <div className="flex items-end justify-between gap-4 border-b border-[#EADBC8] pb-3">
             <h2
               id={`menu-${section.value}`}
-              className="font-display text-[clamp(1.5rem,1.1rem+1.4vw,2.25rem)] uppercase leading-none tracking-tight text-[#3B2417]"
+              className="min-w-0 font-display text-[clamp(1.5rem,1.1rem+1.4vw,2.25rem)] uppercase leading-none tracking-tight text-[#3B2417]"
             >
               {section.label}
             </h2>
-            <span className="font-sans text-[0.75rem] uppercase tracking-wide text-[#B9733A]">
+            <span className="shrink-0 font-sans text-[0.75rem] uppercase tracking-wide text-[#B9733A]">
               {section.items.length}{" "}
               {section.items.length === 1 ? "item" : "items"}
             </span>

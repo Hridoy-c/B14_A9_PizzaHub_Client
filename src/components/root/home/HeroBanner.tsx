@@ -18,7 +18,6 @@ export default function HeroBanner() {
           Special
         </span>
 
-        {/* Decorative wordmark: the real page heading sits below the pizza. */}
         <div
           aria-hidden="true"
           className="select-none bg-gradient-to-b from-[#3B2417] from-30% to-[#B9733A]/35 bg-clip-text text-center font-display text-[clamp(4.5rem,20vw,15rem)] leading-[0.85] tracking-tight text-transparent lg:text-[clamp(7rem,10vw,12rem)]"
@@ -47,16 +46,14 @@ export default function HeroBanner() {
             🧀 Extra cheese
           </span>
 
-          {/* Decorative slices flanking the centre pizza; they track the pizza's
-              box, so they stay aligned as the layout scales. Desktop only. */}
           <Image
             src={sliceLeft}
             alt=""
             aria-hidden="true"
             width={440}
             height={457}
-            sizes="190px"
-            className={`${sideSliceClass} right-full mr-4 w-[150px] -rotate-[6deg] xl:mr-10 xl:w-[190px]`}
+            sizes="140px"
+            className={`${sideSliceClass} right-full mr-10 w-[105px] -rotate-[6deg] xl:mr-20 xl:w-[135px]`}
           />
           <Image
             src={sliceRight}
@@ -64,8 +61,8 @@ export default function HeroBanner() {
             aria-hidden="true"
             width={403}
             height={595}
-            sizes="170px"
-            className={`${sideSliceClass} left-full ml-4 w-[140px] rotate-[5deg] scale-x-[-1] xl:ml-10 xl:w-[175px]`}
+            sizes="130px"
+            className={`${sideSliceClass} left-full ml-10 w-[95px] rotate-[5deg] scale-x-[-1] xl:ml-20 xl:w-[125px]`}
           />
         </div>
 

@@ -40,11 +40,11 @@ const TransactionStats = ({
             <dt className="font-sans text-[0.6875rem] uppercase tracking-[0.14em] text-[#7A6455]">
               {label}
             </dt>
-            <span className="grid size-9 place-items-center rounded-full bg-[#F5EDE3] text-[#B9733A]">
+            <span className="grid size-9 shrink-0 place-items-center rounded-full bg-[#F5EDE3] text-[#B9733A]">
               <Icon className="size-4" aria-hidden="true" />
             </span>
           </div>
-          <dd className="mt-3 font-display text-[2rem] leading-none tracking-tight text-[#3B2417]">
+          <dd className="mt-3 break-words font-display text-[clamp(1.5rem,1.2rem+1vw,2rem)] leading-none tracking-tight text-[#3B2417]">
             {value}
           </dd>
         </div>

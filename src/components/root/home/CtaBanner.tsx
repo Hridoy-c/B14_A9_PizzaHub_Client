@@ -35,10 +35,10 @@ export default function CtaBanner() {
         <div className="relative z-10 flex flex-col items-center text-center">
           {/* Tilted banners */}
           <div className="flex flex-col items-center pt-10 md:pt-6">
-            <h2 className="font-display -rotate-2 rounded-lg bg-[#3B2417] px-6 py-3 text-[clamp(1.75rem,1.4rem+2vw,2.75rem)] uppercase leading-none tracking-tight text-[#F5EDE3] md:px-10 md:py-4">
+            <h2 className="font-display -rotate-2 rounded-lg bg-[#3B2417] px-4 py-2.5 text-[clamp(1.5rem,1.4rem+2vw,2.75rem)] uppercase leading-none tracking-tight text-[#F5EDE3] sm:px-6 sm:py-3 md:px-10 md:py-4">
               Make your pizza
             </h2>
-            <h2 className="font-display -mt-1 rotate-1 rounded-xl bg-[#B9733A] px-6 py-3 text-[clamp(1.75rem,1.4rem+2vw,2.75rem)] uppercase leading-none tracking-tight text-[#F5EDE3] md:px-10 md:py-4">
+            <h2 className="font-display -mt-1 rotate-1 rounded-xl bg-[#B9733A] px-4 py-2.5 text-[clamp(1.5rem,1.4rem+2vw,2.75rem)] uppercase leading-none tracking-tight text-[#F5EDE3] sm:px-6 sm:py-3 md:px-10 md:py-4">
               night special
             </h2>
           </div>

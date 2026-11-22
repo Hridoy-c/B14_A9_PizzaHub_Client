@@ -213,7 +213,7 @@ const MenuDetailsPage = async ({ params }: PageProps) => {
             {pizza.description}
           </p>
 
-          <div className="mt-6 flex items-end justify-between gap-4 border-y border-[#EADBC8] py-5">
+          <div className="mt-6 flex flex-wrap items-end justify-between gap-4 border-y border-[#EADBC8] py-5">
             <div>
               <p className="font-sans text-[0.6875rem] uppercase tracking-[0.16em] text-[#7A6455]">
                 Price

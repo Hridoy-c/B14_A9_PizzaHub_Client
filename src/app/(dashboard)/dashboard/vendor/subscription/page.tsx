@@ -29,9 +29,9 @@ const VendorSubscriptionPage = async () => {
   const { premium: hasPurchased } = await getPlanStatus(user.id);
 
   return (
-    <section className="flex flex-col gap-8">
+    <section className="flex min-w-0 flex-col gap-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
-        <div>
+        <div className="min-w-0">
           <h1 className="font-display text-[clamp(1.75rem,1.4rem+1vw,2.5rem)] leading-none tracking-tight text-[#3B2417]">
             Subscription
           </h1>
@@ -41,7 +41,7 @@ const VendorSubscriptionPage = async () => {
         </div>
 
         <span
-          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[0.8125rem] font-medium ring-1 ring-inset ${
+          className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-[0.8125rem] font-medium ring-1 ring-inset ${
             hasPurchased
               ? "bg-[#EAF3EC] text-[#2F6B3F] ring-[#2F6B3F]/25"
               : "bg-[#FBF1DC] text-[#8A5A00] ring-[#E0A93B]/40"
@@ -57,7 +57,7 @@ const VendorSubscriptionPage = async () => {
       <div className="grid items-start gap-6 lg:grid-cols-[1.3fr_1fr]">
         <article className="flex flex-col gap-6 rounded-2xl border border-[#EADBC8] bg-[#FBF6EF] p-6">
           <div className="flex flex-col gap-1">
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
               <h2 className="font-sans text-[0.9375rem] font-semibold text-[#3B2417]">
                 {PLAN.name}
               </h2>

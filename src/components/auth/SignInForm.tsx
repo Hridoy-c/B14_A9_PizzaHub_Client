@@ -77,7 +77,8 @@ const SignInForm = () => {
       });
 
       setTimeout(() => {
-        window.location.href = "/";
+        router.push("/");
+        router.refresh();
       }, 800);
     } catch {
       toast.dismiss(loadingToast);

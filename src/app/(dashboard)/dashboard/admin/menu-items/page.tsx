@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { headers } from "next/headers";
 import { ImageOff, MapPin } from "lucide-react";
 
 import { getAllMenuForAdmin } from "@/lib/api/menu-item";
@@ -198,7 +197,7 @@ const MenuItemsContent = async ({ searchParams }: PageProps) => {
                 </h2>
 
                 {/* Vendor Information */}
-                <p className="mt-2 text-[0.75rem] text-[#7A6455]">
+                <p className="mt-2 break-words text-[0.75rem] text-[#7A6455]">
                   by {item.vendorName || "Unknown Vendor"}
                   {item.vendorEmail ? ` · ${item.vendorEmail}` : ""}
                 </p>
@@ -255,7 +254,7 @@ const MenuItemsContent = async ({ searchParams }: PageProps) => {
 // Page: no awaiting here, so the header renders instantly
 const AdminMenuItemsPage = ({ searchParams }: PageProps) => {
   return (
-    <section className="flex flex-col gap-6">
+    <section className="flex min-w-0 flex-col gap-6">
       {/* Page Header */}
       <header>
         <h1 className="font-display text-[clamp(1.75rem,1.4rem+1vw,2.5rem)] leading-none tracking-tight text-[#3B2417]">

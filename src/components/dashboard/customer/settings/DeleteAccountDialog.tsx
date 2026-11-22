@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,6 +18,7 @@ import { authClient } from "@/lib/auth-client";
 const CONFIRM_WORD = "DELETE";
 
 const DeleteAccountDialog = () => {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [confirmText, setConfirmText] = useState("");
   const [password, setPassword] = useState("");
@@ -47,7 +49,8 @@ const DeleteAccountDialog = () => {
     }
 
     // Session is gone, so leave the dashboard.
-    window.location.href = "/";
+    router.push("/");
+    router.refresh();
   };
 
   return (

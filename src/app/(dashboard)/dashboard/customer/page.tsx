@@ -207,7 +207,7 @@ const CustomerOverviewPage = async () => {
   ];
 
   return (
-    <section className="flex flex-col gap-8">
+    <section className="flex min-w-0 flex-col gap-8">
       {/* Header */}
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>

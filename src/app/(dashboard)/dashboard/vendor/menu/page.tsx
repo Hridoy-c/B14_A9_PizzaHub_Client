@@ -25,7 +25,7 @@ const VendorMenuPage = async () => {
   const items = await getMyMenu(user.id);
 
   return (
-    <section className="flex flex-col gap-6">
+    <section className="flex min-w-0 flex-col gap-6">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="font-display text-[clamp(1.75rem,1.4rem+1vw,2.5rem)] leading-none tracking-tight text-[#3B2417]">
@@ -93,7 +93,7 @@ const VendorMenuPage = async () => {
                   {item.description}
                 </p>
 
-                <div className="mt-4 flex items-center justify-between gap-3">
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
                   <p className="font-display text-[1.25rem] leading-none tracking-tight text-[#7A2E12]">
                     ${Number(item.price).toFixed(2)}
                   </p>
@@ -113,7 +113,7 @@ const VendorMenuPage = async () => {
                 </div>
 
                 {/* Manage */}
-                <div className="mt-4 flex gap-2 border-t border-[#EADBC8] pt-4 font-sans">
+                <div className="mt-4 flex flex-wrap gap-2 border-t border-[#EADBC8] pt-4 font-sans">
                   <EditMenuItemDialog
                     item={{
                       id,

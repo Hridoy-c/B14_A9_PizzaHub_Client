@@ -141,7 +141,7 @@ const VendorOverviewPage = async () => {
   const firstName = user.name?.split(" ")[0] ?? "there";
 
   return (
-    <section className="flex flex-col gap-8">
+    <section className="flex min-w-0 flex-col gap-8">
       {/* Header */}
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
@@ -161,7 +161,7 @@ const VendorOverviewPage = async () => {
       </header>
 
       {/* Stat cards */}
-      <ul className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <ul className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 lg:grid-cols-4">
         {stats.map(({ label, value, hint, icon: Icon, accent }) => (
           <li
             key={label}

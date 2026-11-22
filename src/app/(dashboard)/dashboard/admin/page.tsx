@@ -9,7 +9,6 @@ import {
   Wallet,
   type LucideIcon,
 } from "lucide-react";
-import { headers } from "next/headers";
 import { requireUser } from "@/lib/cors/Session";
 import { getAllOrdersForAdmin } from "@/lib/api/orders";
 import { getAllMenuForAdmin } from "@/lib/api/menu-item";
@@ -23,12 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-// Reads the session, so it cannot be prerendered.
 export const instant = false;
-
-/* ------------------------------------------------------------------ */
-/* Helpers                                                             */
-/* ------------------------------------------------------------------ */
 
 const dateFormat = new Intl.DateTimeFormat("en-GB", {
   day: "numeric",
@@ -67,7 +61,6 @@ const within = (iso: string | Date, from: number, to: number) => {
   return t >= from && t < to;
 };
 
-/** Percentage change between two periods. null means there is nothing to compare. */
 const percentChange = (current: number, previous: number) => {
   if (previous === 0) return current === 0 ? null : Infinity;
   return ((current - previous) / previous) * 100;
@@ -103,10 +96,6 @@ const STATUSES = [
 const statusMeta = (status: string) =>
   STATUSES.find((s) => s.key === status) ?? STATUSES[3];
 
-/* ------------------------------------------------------------------ */
-/* Small presentational pieces                                         */
-/* ------------------------------------------------------------------ */
-
 const Trend = ({ change }: { change: number | null }) => {
   if (change === null) {
     return (
@@ -130,7 +119,7 @@ const Trend = ({ change }: { change: number | null }) => {
 
   return (
     <span
-      className={`inline-flex items-center gap-1 text-[0.75rem] font-medium ${
+      className={`inline-flex flex-wrap items-center gap-x-1 text-[0.75rem] font-medium ${
         up ? "text-[#2F6B3F]" : "text-[#A33A1F]"
       }`}
     >
@@ -154,7 +143,7 @@ const Card = ({
   className?: string;
 }) => (
   <article
-    className={`flex flex-col gap-5 rounded-2xl border border-[#EADBC8] bg-[#FBF6EF] p-5 ${className}`}
+    className={`flex min-w-0 flex-col gap-4 rounded-2xl border border-[#EADBC8] bg-[#FBF6EF] p-4 sm:gap-5 sm:p-5 ${className}`}
   >
     <div className="flex items-center justify-between gap-3">
       <h2 className="font-sans text-[0.9375rem] font-semibold text-[#3B2417]">
@@ -163,7 +152,7 @@ const Card = ({
       {action ? (
         <Link
           href={action.href}
-          className="inline-flex items-center gap-1 font-sans text-[0.8125rem] font-medium text-[#B9733A] underline-offset-4 hover:underline"
+          className="inline-flex shrink-0 items-center gap-1 font-sans text-[0.8125rem] font-medium text-[#B9733A] underline-offset-4 hover:underline"
         >
           {action.label}
           <ArrowRight className="size-3.5" aria-hidden="true" />
@@ -178,9 +167,16 @@ const EmptyNote = ({ children }: { children: React.ReactNode }) => (
   <p className="py-6 text-center text-[0.875rem] text-[#7A6455]">{children}</p>
 );
 
-/* ------------------------------------------------------------------ */
-/* Page                                                                */
-/* ------------------------------------------------------------------ */
+const StatusBadge = ({ status }: { status: string }) => {
+  const meta = statusMeta(status);
+  return (
+    <span
+      className={`inline-flex shrink-0 rounded-full px-2.5 py-0.5 text-[0.75rem] font-medium ring-1 ring-inset ${meta.badge}`}
+    >
+      {meta.label}
+    </span>
+  );
+};
 
 const AdminOverviewPage = async () => {
   const user = await requireUser();
@@ -196,7 +192,6 @@ const AdminOverviewPage = async () => {
   const currentFrom = today - 6 * DAY_MS;
   const previousFrom = today - 13 * DAY_MS;
 
-  // ---- period comparisons (last 7 days vs. the 7 before) ----
   const acceptedOrders = orders.filter((o) => o.status === "accepted");
   const sumRevenue = (from: number, to: number) =>
     acceptedOrders
@@ -221,7 +216,6 @@ const AdminOverviewPage = async () => {
   const pendingOrders = orders.filter((o) => o.status === "pending").length;
   const pendingMenu = menu.filter((m) => m.status === "pending");
 
-  // ---- 7 day activity chart ----
   const week = Array.from({ length: 7 }, (_, i) => {
     const day = today - (6 - i) * DAY_MS;
     return {
@@ -236,13 +230,11 @@ const AdminOverviewPage = async () => {
   const barHeight = (n: number) =>
     `${Math.max((n / maxCount) * 100, n ? 6 : 0)}%`;
 
-  // ---- order status mix ----
   const statusMix = STATUSES.map((s) => ({
     ...s,
     count: orders.filter((o) => o.status === s.key).length,
   }));
 
-  // ---- latest orders ----
   const recentOrders = [...orders]
     .sort(
       (a, b) =>
@@ -284,14 +276,13 @@ const AdminOverviewPage = async () => {
   const needsAttention = pendingMenu.length + pendingOrders;
 
   return (
-    <section className="flex flex-col gap-8">
-      {/* Header */}
-      <header className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="font-display text-[clamp(1.75rem,1.4rem+1vw,2.5rem)] leading-none tracking-tight text-[#3B2417]">
+    <section className="flex min-w-0 flex-col gap-6 sm:gap-8">
+      <header className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between sm:gap-4">
+        <div className="min-w-0">
+          <h1 className="font-display text-[clamp(1.5rem,1.2rem+1.4vw,2.5rem)] leading-none tracking-tight text-[#3B2417]">
             Platform overview
           </h1>
-          <p className="mt-2 max-w-[60ch] text-[0.9375rem] leading-relaxed text-[#7A6455]">
+          <p className="mt-2 max-w-[60ch] text-[0.875rem] leading-relaxed text-[#7A6455] sm:text-[0.9375rem]">
             Welcome back, {firstName}.{" "}
             {needsAttention > 0
               ? `${needsAttention} ${needsAttention === 1 ? "item needs" : "items need"} your attention.`
@@ -303,23 +294,22 @@ const AdminOverviewPage = async () => {
         </p>
       </header>
 
-      {/* KPIs */}
-      <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <ul className="grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 xl:grid-cols-4">
         {kpis.map(({ label, value, icon: Icon, change, note }) => (
           <li
             key={label}
-            className="flex flex-col gap-4 rounded-2xl border border-[#EADBC8] bg-[#FBF6EF] p-5"
+            className="flex min-w-0 flex-col gap-3 rounded-2xl border border-[#EADBC8] bg-[#FBF6EF] p-4 sm:gap-4 sm:p-5"
           >
             <div className="flex items-center justify-between gap-3">
               <p className="font-sans text-[0.8125rem] text-[#7A6455]">
                 {label}
               </p>
-              <span className="flex size-8 items-center justify-center rounded-lg bg-[#EADBC8] text-[#7A2E12]">
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#EADBC8] text-[#7A2E12]">
                 <Icon className="size-4" aria-hidden="true" />
               </span>
             </div>
-            <div className="flex flex-col gap-1.5">
-              <p className="font-display text-[2rem] leading-none tracking-tight text-[#3B2417]">
+            <div className="flex min-w-0 flex-col gap-1.5">
+              <p className="truncate font-display text-[1.75rem] leading-none tracking-tight text-[#3B2417] sm:text-[2rem]">
                 {value}
               </p>
               <Trend change={change} />
@@ -328,11 +318,10 @@ const AdminOverviewPage = async () => {
           </li>
         ))}
 
-        {/* Approvals card: the one that asks for action */}
-        <li>
+        <li className="min-w-0">
           <Link
             href="/dashboard/admin/menu-items"
-            className={`flex h-full flex-col gap-4 rounded-2xl border p-5 transition-colors ${
+            className={`flex h-full flex-col gap-3 rounded-2xl border p-4 transition-colors sm:gap-4 sm:p-5 ${
               pendingMenu.length > 0
                 ? "border-[#E0A93B] bg-[#FBF1DC] hover:bg-[#F8E9C8]"
                 : "border-[#EADBC8] bg-[#FBF6EF] hover:bg-[#F6EEE2]"
@@ -342,12 +331,12 @@ const AdminOverviewPage = async () => {
               <p className="font-sans text-[0.8125rem] text-[#7A6455]">
                 Menu approvals
               </p>
-              <span className="flex size-8 items-center justify-center rounded-lg bg-[#EADBC8] text-[#7A2E12]">
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#EADBC8] text-[#7A2E12]">
                 <ShieldCheck className="size-4" aria-hidden="true" />
               </span>
             </div>
             <div className="flex flex-col gap-1.5">
-              <p className="font-display text-[2rem] leading-none tracking-tight text-[#3B2417]">
+              <p className="font-display text-[1.75rem] leading-none tracking-tight text-[#3B2417] sm:text-[2rem]">
                 {pendingMenu.length}
               </p>
               <p className="text-[0.75rem] text-[#7A6455]">
@@ -364,10 +353,9 @@ const AdminOverviewPage = async () => {
         </li>
       </ul>
 
-      {/* Activity + status */}
-      <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-[1.6fr_1fr]">
         <Card title="Activity, last 7 days">
-          <div className="flex items-center gap-5 text-[0.75rem] text-[#7A6455]">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[0.75rem] text-[#7A6455]">
             <span className="inline-flex items-center gap-1.5">
               <span className="size-2.5 rounded-sm bg-[#7A2E12]" />
               Orders
@@ -379,7 +367,6 @@ const AdminOverviewPage = async () => {
           </div>
 
           <div className="relative">
-            {/* gridlines */}
             <div
               className="pointer-events-none absolute inset-x-0 top-0 bottom-6 flex flex-col justify-between"
               aria-hidden="true"
@@ -389,14 +376,14 @@ const AdminOverviewPage = async () => {
               ))}
             </div>
 
-            <ul className="relative flex h-52 items-end justify-between gap-3">
+            <ul className="relative flex h-44 items-end justify-between gap-1.5 sm:h-52 sm:gap-3">
               {week.map((d) => (
                 <li
                   key={d.key}
-                  className="flex h-full flex-1 flex-col items-center justify-end gap-2"
+                  className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-2"
                 >
                   <div
-                    className="flex w-full flex-1 items-end justify-center gap-1"
+                    className="flex w-full flex-1 items-end justify-center gap-0.5 sm:gap-1"
                     role="img"
                     aria-label={`${d.label}: ${d.orders} orders, ${d.signups} new users`}
                   >
@@ -412,7 +399,7 @@ const AdminOverviewPage = async () => {
                     />
                   </div>
                   <span
-                    className={`h-4 text-[0.75rem] ${
+                    className={`h-4 text-[0.6875rem] sm:text-[0.75rem] ${
                       d.isToday
                         ? "font-semibold text-[#3B2417]"
                         : "text-[#7A6455]"
@@ -461,13 +448,13 @@ const AdminOverviewPage = async () => {
                   >
                     <span className="inline-flex items-center gap-2 text-[#3B2417]">
                       <span
-                        className="size-2.5 rounded-full"
+                        className="size-2.5 shrink-0 rounded-full"
                         style={{ backgroundColor: s.color }}
                         aria-hidden="true"
                       />
                       {s.label}
                     </span>
-                    <span className="tabular-nums text-[#7A6455]">
+                    <span className="shrink-0 tabular-nums text-[#7A6455]">
                       <span className="font-medium text-[#3B2417]">
                         {s.count}
                       </span>{" "}
@@ -481,8 +468,7 @@ const AdminOverviewPage = async () => {
         </Card>
       </div>
 
-      {/* Latest orders + attention */}
-      <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-[1.6fr_1fr]">
         <Card
           title="Latest orders"
           action={{
@@ -493,46 +479,67 @@ const AdminOverviewPage = async () => {
           {recentOrders.length === 0 ? (
             <EmptyNote>No orders yet. New orders will be listed here.</EmptyNote>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow className="border-[#EADBC8] hover:bg-transparent">
-                  <TableHead className="text-[#7A6455]">Item</TableHead>
-                  <TableHead className="text-[#7A6455]">Placed</TableHead>
-                  <TableHead className="text-[#7A6455]">Status</TableHead>
-                  <TableHead className="text-right text-[#7A6455]">
-                    Amount
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {recentOrders.map((order) => {
-                  const meta = statusMeta(order.status);
-                  return (
-                    <TableRow
-                      key={order._id}
-                      className="border-[#EADBC8] hover:bg-[#F6EEE2]"
-                    >
-                      <TableCell className="max-w-48 truncate font-medium text-[#3B2417]">
+            <>
+              <ul className="flex flex-col divide-y divide-[#EADBC8] sm:hidden">
+                {recentOrders.map((order) => (
+                  <li
+                    key={order._id}
+                    className="flex flex-col gap-1.5 py-3 first:pt-0 last:pb-0"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="min-w-0 break-words text-[0.875rem] font-medium text-[#3B2417]">
                         {order.item?.name ?? "Item no longer available"}
-                      </TableCell>
-                      <TableCell className="text-[#7A6455]">
+                      </p>
+                      <StatusBadge status={order.status} />
+                    </div>
+                    <div className="flex items-center justify-between gap-3 text-[0.8125rem]">
+                      <span className="text-[#7A6455]">
                         {shortDate.format(new Date(order.createdAt))}
-                      </TableCell>
-                      <TableCell>
-                        <span
-                          className={`inline-flex rounded-full px-2.5 py-0.5 text-[0.75rem] font-medium ring-1 ring-inset ${meta.badge}`}
-                        >
-                          {meta.label}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right tabular-nums text-[#3B2417]">
+                      </span>
+                      <span className="tabular-nums font-medium text-[#3B2417]">
                         {money(priceOf(order))}
-                      </TableCell>
+                      </span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="hidden sm:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-[#EADBC8] hover:bg-transparent">
+                      <TableHead className="text-[#7A6455]">Item</TableHead>
+                      <TableHead className="text-[#7A6455]">Placed</TableHead>
+                      <TableHead className="text-[#7A6455]">Status</TableHead>
+                      <TableHead className="text-right text-[#7A6455]">
+                        Amount
+                      </TableHead>
                     </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {recentOrders.map((order) => (
+                      <TableRow
+                        key={order._id}
+                        className="border-[#EADBC8] hover:bg-[#F6EEE2]"
+                      >
+                        <TableCell className="max-w-40 truncate font-medium text-[#3B2417] lg:max-w-48">
+                          {order.item?.name ?? "Item no longer available"}
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap text-[#7A6455]">
+                          {shortDate.format(new Date(order.createdAt))}
+                        </TableCell>
+                        <TableCell>
+                          <StatusBadge status={order.status} />
+                        </TableCell>
+                        <TableCell className="text-right tabular-nums text-[#3B2417]">
+                          {money(priceOf(order))}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </>
           )}
         </Card>
 
@@ -542,7 +549,7 @@ const AdminOverviewPage = async () => {
         >
           <ul className="flex flex-col divide-y divide-[#EADBC8]">
             <li className="flex items-center justify-between gap-3 py-3 first:pt-0">
-              <div>
+              <div className="min-w-0">
                 <p className="text-[0.875rem] font-medium text-[#3B2417]">
                   Menu items awaiting approval
                 </p>
@@ -552,7 +559,7 @@ const AdminOverviewPage = async () => {
               </div>
               <Link
                 href="/dashboard/admin/menu-items"
-                className={`rounded-full px-3 py-1 text-[0.8125rem] font-semibold tabular-nums ${
+                className={`shrink-0 rounded-full px-3 py-1 text-[0.8125rem] font-semibold tabular-nums ${
                   pendingMenu.length > 0
                     ? "bg-[#E0A93B] text-[#3B2417]"
                     : "bg-[#EADBC8] text-[#7A6455]"
@@ -562,7 +569,7 @@ const AdminOverviewPage = async () => {
               </Link>
             </li>
             <li className="flex items-center justify-between gap-3 py-3 last:pb-0">
-              <div>
+              <div className="min-w-0">
                 <p className="text-[0.875rem] font-medium text-[#3B2417]">
                   Orders pending vendor decision
                 </p>
@@ -572,7 +579,7 @@ const AdminOverviewPage = async () => {
               </div>
               <Link
                 href="/dashboard/admin/transactions"
-                className={`rounded-full px-3 py-1 text-[0.8125rem] font-semibold tabular-nums ${
+                className={`shrink-0 rounded-full px-3 py-1 text-[0.8125rem] font-semibold tabular-nums ${
                   pendingOrders > 0
                     ? "bg-[#E0A93B] text-[#3B2417]"
                     : "bg-[#EADBC8] text-[#7A6455]"
@@ -594,7 +601,9 @@ const AdminOverviewPage = async () => {
                     key={item._id}
                     className="flex items-center justify-between gap-3 text-[0.875rem]"
                   >
-                    <span className="truncate text-[#3B2417]">{item.name}</span>
+                    <span className="min-w-0 truncate text-[#3B2417]">
+                      {item.name}
+                    </span>
                     {typeof item.price === "number" ? (
                       <span className="shrink-0 tabular-nums text-[#7A6455]">
                         {money(item.price)}

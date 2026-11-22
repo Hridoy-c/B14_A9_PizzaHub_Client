@@ -155,7 +155,7 @@ const UserCard = ({
   isSelf: boolean;
   canBlock: boolean;
 }) => (
-  <li className="rounded-3xl border border-[#EADBC8] bg-[#FBF6EF] p-4">
+  <li className="overflow-hidden rounded-3xl border border-[#EADBC8] bg-[#FBF6EF] p-4">
     <div className="flex items-start gap-3">
       <Avatar className="size-11 shrink-0 ring-2 ring-[#EADBC8]">
         <AvatarImage src={user.image ?? undefined} alt={user.name} />
@@ -165,8 +165,8 @@ const UserCard = ({
       </Avatar>
 
       <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <p className="truncate font-sans text-[0.9375rem] text-[#3B2417]">
+        <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+          <p className="min-w-0 max-w-full truncate font-sans text-[0.9375rem] text-[#3B2417]">
             {user.name}
           </p>
           {isSelf ? (
@@ -212,7 +212,6 @@ const UsersSkeleton = () => (
       <div className="h-10 w-full animate-pulse rounded-full bg-[#EADBC8] sm:w-72" />
     </div>
 
-    {/* Mobile / tablet cards */}
     <div className="flex flex-col gap-3 xl:hidden">
       {[0, 1, 2, 3].map((i) => (
         <div
@@ -231,7 +230,6 @@ const UsersSkeleton = () => (
       ))}
     </div>
 
-    {/* Desktop table */}
     <div className="hidden overflow-hidden rounded-3xl border border-[#EADBC8] bg-[#FBF6EF] xl:block">
       {[0, 1, 2, 3, 4].map((i) => (
         <div
@@ -267,7 +265,6 @@ const UsersContent = async ({ searchParams }: PageProps) => {
         </p>
       ) : (
         <>
-          {/* Mobile / tablet: cards */}
           <ul aria-label="Users" className="flex flex-col gap-3 xl:hidden">
             {users.map((user) => {
               const userRole = dashboardRole(user.role);
@@ -286,8 +283,7 @@ const UsersContent = async ({ searchParams }: PageProps) => {
             })}
           </ul>
 
-          {/* Desktop: table */}
-          <div className="hidden overflow-hidden rounded-3xl border border-[#EADBC8] bg-[#FBF6EF] xl:block">
+          <div className="hidden overflow-x-auto rounded-3xl border border-[#EADBC8] bg-[#FBF6EF] xl:block">
             <Table className="min-w-[860px]">
               <TableHeader className="bg-[#F5EDE3]">
                 <TableRow className="border-[#EADBC8] hover:bg-transparent">
@@ -339,7 +335,8 @@ const UsersContent = async ({ searchParams }: PageProps) => {
                       </TableCell>
 
                       <TableCell
-                        className={`${cellClass} font-sans text-[0.875rem] text-[#7A6455]`}
+                        className={`${cellClass} max-w-[22ch] truncate font-sans text-[0.875rem] text-[#7A6455]`}
+                        title={user.email}
                       >
                         {user.email}
                       </TableCell>
@@ -386,7 +383,7 @@ const UsersContent = async ({ searchParams }: PageProps) => {
 
 const AdminUsersPage = ({ searchParams }: PageProps) => {
   return (
-    <section className="flex flex-col gap-6">
+    <section className="flex min-w-0 flex-col gap-6">
       <header>
         <h1 className="font-display text-[clamp(1.75rem,1.4rem+1vw,2.5rem)] leading-none tracking-tight text-[#3B2417]">
           Manage Users

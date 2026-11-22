@@ -22,9 +22,9 @@ const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
       />
 
       <div className="flex min-h-svh flex-1 flex-col bg-[#F5EDE3]">
-        <header className="flex h-14 items-center gap-3 border-b border-[#EADBC8] px-4 font-sans sm:px-6">
+        <header className="flex h-14 items-center gap-3 border-b border-[#EADBC8] px-3 font-sans sm:px-6">
           <SidebarTrigger className="-ml-1 text-[#3B2417] hover:bg-[#3B2417]/5 md:hidden" />
-          <p className="truncate text-[0.875rem] text-[#7A6455]">
+          <p className="min-w-0 truncate text-[0.875rem] text-[#7A6455]">
             Signed in as{' '}
             <span className="text-[#3B2417]">{user.name}</span>
           </p>
@@ -32,7 +32,7 @@ const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
 
         <GridRule className="h-10 md:h-14" />
 
-        <main className="mx-auto w-full max-w-[1200px] flex-1 px-5 py-8 font-sans sm:px-8">
+        <main className="mx-auto w-full min-w-0 max-w-[1200px] flex-1 px-4 py-6 font-sans sm:px-8 sm:py-8">
           {children}
         </main>
 

@@ -34,7 +34,7 @@ const CustomerOrdersPage = async ({
     active === "all" ? orders : orders.filter((o) => o.status === active);
 
   return (
-    <section className="flex flex-col gap-6">
+    <section className="flex min-w-0 flex-col gap-6">
       <header>
         <h1 className="font-display text-[clamp(1.75rem,1.4rem+1vw,2.5rem)] leading-none tracking-tight text-[#3B2417]">
           My Orders

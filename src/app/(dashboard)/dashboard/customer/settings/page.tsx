@@ -81,7 +81,7 @@ const CustomerSettingsPage = async () => {
   const user = await requireUser();
 
   return (
-    <section className="flex max-w-3xl flex-col gap-8">
+    <section className="flex min-w-0 max-w-3xl flex-col gap-8">
       <header className="flex items-center gap-4">
         <span
           className="flex size-14 shrink-0 items-center justify-center rounded-full bg-[#7A2E12] font-display text-[1.25rem] text-[#FBF6EF]"

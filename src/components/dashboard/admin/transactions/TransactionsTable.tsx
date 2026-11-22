@@ -77,7 +77,7 @@ const TransactionsTable = ({
 
   return (
     <div className="overflow-hidden rounded-3xl border border-[#EADBC8] bg-[#FBF6EF]">
-      <ul className="divide-y divide-[#EADBC8] md:hidden">
+      <ul className="divide-y divide-[#EADBC8] lg:hidden">
         {transactions.map((tx) => {
           const { paymentId } = details(tx);
 
@@ -121,7 +121,7 @@ const TransactionsTable = ({
         })}
       </ul>
 
-      <div className="hidden md:block">
+      <div className="hidden overflow-x-auto lg:block">
         <Table className="min-w-[680px]">
           <TableHeader className="bg-[#F5EDE3]">
             <TableRow className="border-[#EADBC8] hover:bg-transparent">

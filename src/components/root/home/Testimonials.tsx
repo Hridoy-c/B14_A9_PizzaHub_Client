@@ -62,7 +62,7 @@ export default function Testimonials() {
           {testimonials.map((t, i) => (
             <figure
               key={i}
-              className="mr-5 flex min-h-[260px] w-[300px] flex-col justify-between rounded-3xl border border-[#EADBC8] bg-white/60 p-6 md:w-[380px]"
+              className="mr-4 flex min-h-[260px] w-[280px] flex-col justify-between rounded-3xl border border-[#EADBC8] bg-white/60 p-5 sm:mr-5 sm:p-6 md:w-[380px]"
             >
               <div className="space-y-5">
                 <Stars />
