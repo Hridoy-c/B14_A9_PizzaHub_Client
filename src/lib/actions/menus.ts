@@ -123,6 +123,7 @@ const callMenuItem = async (
     }
 
     revalidatePath("/dashboard/vendor/menu");
+        revalidatePath("/dashboard/admin/menu-items");
     revalidatePath("/menu");
     revalidatePath("/");
 
@@ -145,3 +146,14 @@ export const updateMenuItemAction = async (
 export const deleteMenuItemAction = async (
   id: string,
 ): Promise<ActionResponse> => callMenuItem(id, "DELETE");
+
+
+export const setMenuAvailabilityAction = async (
+  id: string,
+  status: "approved" | "inactive",
+): Promise<ActionResponse> => callMenuItem(id, "PATCH", { status });
+
+export const adminSetMenuStatusAction = async (
+  id: string,
+  status: "approved" | "rejected" | "inactive",
+): Promise<ActionResponse> => callMenuItem(id, "PATCH", { status });

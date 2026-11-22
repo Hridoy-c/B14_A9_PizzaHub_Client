@@ -39,8 +39,36 @@ const CheckOutSuccessPage = async ({ searchParams }: Props) => {
 
   const result = await checkoutVerify(sessionId);
 
+  // Verify fail hole chupchap redirect na kore error dekhao,
+  // karon Stripe-e taka kata gele thakte pare.
   if (!result?.success || result.userId !== user.id) {
-    redirect("/dashboard/vendor/subscription");
+    return (
+      <section className="mx-auto flex w-full max-w-xl flex-col gap-6 py-6 sm:py-12">
+        <article className="flex flex-col items-center gap-4 rounded-2xl border border-[#EADBC8] bg-[#FBF6EF] p-6 text-center sm:p-10">
+          <h1 className="font-display text-[1.75rem] text-[#3B2417]">
+            We could not confirm your payment
+          </h1>
+          <p className="max-w-[44ch] text-[0.9375rem] text-[#7A6455]">
+            {result?.message ??
+              "If you were charged, do not pay again. Try verifying once more."}
+          </p>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Link
+              href={`/dashboard/vendor/subscription/success?session_id=${sessionId}`}
+              className="inline-flex items-center justify-center rounded-full bg-[#3B2417] px-6 py-2.5 font-sans text-[0.875rem] text-[#F5EDE3] transition-colors hover:bg-[#2A1A10]"
+            >
+              Try again
+            </Link>
+            <Link
+              href="/dashboard/vendor/subscription"
+              className="inline-flex items-center justify-center rounded-full border border-[#3B2417] px-6 py-2.5 font-sans text-[0.875rem] text-[#3B2417] transition-colors hover:bg-[#3B2417] hover:text-[#F5EDE3]"
+            >
+              Back to subscription
+            </Link>
+          </div>
+        </article>
+      </section>
+    );
   }
 
   return (

@@ -4,7 +4,6 @@ import "./globals.css";
 
 import Toaster from "@/components/ui/sonner";
 
-
 const domaine = localFont({
   src: "../assets/fonts/domaine-display-condensed-medium.ttf",
   variable: "--font-domaine",
@@ -38,7 +37,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
       className={`${domaine.variable} ${generalSans.variable} ${robotoFlex.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col bg-[#F5EDE3] font-body text-[#2A1A10]">
+      <body
+        suppressHydrationWarning
+        className="flex min-h-full flex-col bg-[#F5EDE3] font-body text-[#2A1A10]"
+      >
         {children}
         <Toaster />
       </body>

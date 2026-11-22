@@ -37,15 +37,11 @@ const buttonClass =
   "inline-flex h-9 items-center justify-center gap-2 rounded-xl border border-[#EADBC8] bg-white px-3 text-[0.8125rem] font-medium text-[#3B2417] shadow-sm transition-all hover:-translate-y-0.5 hover:bg-[#F5EDE3] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B9733A]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#FBF6EF]";
 
 const signInWithGithub = async () => {
-  await authClient.signIn.social({
-    provider: "github",
-  });
+  await authClient.signIn.social({ provider: "github", callbackURL: "/dashboard" });
 };
 
 const signInWithGoogle = async () => {
-  await authClient.signIn.social({
-    provider: "google",
-  });
+  await authClient.signIn.social({ provider: "google", callbackURL: "/dashboard" });
 };
 const SocialAuthButtons = () => {
   return (

@@ -21,6 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { getAllTransactionsForAdmin } from "@/lib/api/transactions";
 
 export const instant = false;
 
@@ -181,10 +182,11 @@ const StatusBadge = ({ status }: { status: string }) => {
 const AdminOverviewPage = async () => {
   const user = await requireUser();
 
-  const [orders, users, menu] = await Promise.all([
+   const [orders, users, menu, transactions] = await Promise.all([
     getAllOrdersForAdmin(),
     getAllUsersForAdmin(),
     getAllMenuForAdmin(),
+    getAllTransactionsForAdmin(),
   ]);
 
   const today = startOfUtcDay(new Date());
@@ -215,6 +217,16 @@ const AdminOverviewPage = async () => {
 
   const pendingOrders = orders.filter((o) => o.status === "pending").length;
   const pendingMenu = menu.filter((m) => m.status === "pending");
+  const customerCount = users.filter((u) => u.role === "customer").length;
+
+  const totals = [
+    { label: "Total users", value: users.length },
+    { label: "Vendors", value: vendorCount },
+    { label: "Customers", value: customerCount },
+    { label: "Menu items", value: menu.length },
+    { label: "Pending menu items", value: pendingMenu.length },
+    { label: "Transactions", value: transactions.length },
+  ];
 
   const week = Array.from({ length: 7 }, (_, i) => {
     const day = today - (6 - i) * DAY_MS;
@@ -351,6 +363,19 @@ const AdminOverviewPage = async () => {
             </div>
           </Link>
         </li>
+      </ul>
+            <ul className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+        {totals.map(({ label, value }) => (
+          <li
+            key={label}
+            className="rounded-2xl border border-[#EADBC8] bg-[#FBF6EF] p-4"
+          >
+            <p className="font-sans text-[0.75rem] text-[#7A6455]">{label}</p>
+            <p className="mt-2 font-display text-[1.75rem] leading-none tracking-tight text-[#3B2417]">
+              {value}
+            </p>
+          </li>
+        ))}
       </ul>
 
       <div className="grid gap-4 sm:gap-6 lg:grid-cols-[1.6fr_1fr]">

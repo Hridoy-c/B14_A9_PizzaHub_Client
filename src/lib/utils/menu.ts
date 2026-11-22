@@ -11,4 +11,8 @@ export const toCardPizza = (item: MenuItem): CardPizza => ({
   price: item.price,
   image: item.image ?? item.images?.[0] ?? "",
   description: item.description,
+  category: categoryLabel(item.category),
+  location: item.location,
+  vendorName: item.vendorName,
+  vendorPremium: Boolean(item.vendorPremium),
 });

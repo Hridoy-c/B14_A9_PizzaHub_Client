@@ -6,6 +6,7 @@ import { ImageOff, MapPin } from "lucide-react";
 import { getAllMenuForAdmin } from "@/lib/api/menu-item";
 import { categoryLabel } from "@/lib/utils/menu";
 import type { MenuItemStatus } from "@/lib/types";
+import MenuSearchBar from "@/components/root/menu/MenuSearchBar";
 
 import MenuStatusActions from "@/components/dashboard/admin/menu/MenuStatusActions";
 
@@ -18,14 +19,13 @@ const statusStyles: Record<MenuItemStatus, string> = {
 };
 
 // Available filters
-const filters = ["all", "pending", "approved", "rejected"] as const;
+const filters = ["all", "pending", "approved", "rejected", "inactive"] as const;
 
 type Filter = (typeof filters)[number];
 
 type PageProps = {
-  searchParams: Promise<{ status?: string }>;
+  searchParams: Promise<{ status?: string; q?: string }>;
 };
-
 // Format price
 const priceLabel = (price: number | string) => {
   const value = typeof price === "number" ? price : Number(price);
@@ -73,8 +73,11 @@ const MenuItemsSkeleton = () => (
 // Dynamic part: reads searchParams + cookies and fetches data.
 // This must live inside <Suspense> so the page shell can be prerendered.
 const MenuItemsContent = async ({ searchParams }: PageProps) => {
-  // Get selected filter from URL
-  const { status } = await searchParams;
+  // Get selected filter and search text from URL
+  const { status, q } = await searchParams;
+
+  const rawQuery = (q ?? "").trim();
+  const query = rawQuery.toLowerCase();
 
   const active: Filter = filters.find((f) => f === status) ?? "all";
 
@@ -96,15 +99,25 @@ const MenuItemsContent = async ({ searchParams }: PageProps) => {
     counts[itemStatus] += 1;
   }
 
-  // Filter menu items
-  const visible =
-    active === "all"
-      ? items
-      : items.filter((item) => getValidStatus(item.status) === active);
+  // Filter by status, then by search text
+  const visible = items
+    .filter(
+      (item) => active === "all" || getValidStatus(item.status) === active,
+    )
+    .filter(
+      (item) =>
+        !query ||
+        [item.name, item.vendorName, item.vendorEmail, item.location]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(query)),
+    );
 
   return (
     <>
-      {/* Status Filters */}
+      {/* Search */}
+      <MenuSearchBar />
+
+      {/* Status Filters (keep the search text when switching status) */}
       <nav
         aria-label="Filter by status"
         className="flex flex-wrap gap-2 font-sans text-[0.875rem]"
@@ -112,14 +125,15 @@ const MenuItemsContent = async ({ searchParams }: PageProps) => {
         {filters.map((f) => {
           const count = f === "all" ? items.length : counts[f];
 
+          const params = new URLSearchParams();
+          if (f !== "all") params.set("status", f);
+          if (rawQuery) params.set("q", rawQuery);
+          const qs = params.toString();
+
           return (
             <Link
               key={f}
-              href={
-                f === "all"
-                  ? "/dashboard/admin/menu-items"
-                  : `/dashboard/admin/menu-items?status=${f}`
-              }
+              href={`/dashboard/admin/menu-items${qs ? `?${qs}` : ""}`}
               aria-current={f === active ? "page" : undefined}
               className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 capitalize transition-colors ${
                 f === active
@@ -146,9 +160,11 @@ const MenuItemsContent = async ({ searchParams }: PageProps) => {
       {/* Empty State or Menu Items */}
       {visible.length === 0 ? (
         <p className="rounded-3xl border border-dashed border-[#EADBC8] bg-[#FBF6EF] p-10 text-center text-[0.9375rem] text-[#7A6455]">
-          {active === "all"
-            ? "No menu items yet. Vendors can submit dishes from their dashboard."
-            : `No ${active} items right now.`}
+          {rawQuery
+            ? `No ${active === "all" ? "" : `${active} `}items match "${rawQuery}".`
+            : active === "all"
+              ? "No menu items yet. Vendors can submit dishes from their dashboard."
+              : `No ${active} items right now.`}
         </p>
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -239,6 +255,7 @@ const MenuItemsContent = async ({ searchParams }: PageProps) => {
                 <div className="mt-4 border-t border-[#EADBC8] pt-3">
                   <MenuStatusActions
                     id={String(item._id)}
+                    name={item.name}
                     status={itemStatus}
                   />
                 </div>

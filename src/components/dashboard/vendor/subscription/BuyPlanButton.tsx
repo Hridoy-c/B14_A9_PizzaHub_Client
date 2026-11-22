@@ -47,7 +47,7 @@ const BuyPlanButton = ({ price }: { price: number }) => {
         className="w-full"
       >
         <Lock className="size-4" aria-hidden="true" />
-        {loading ? "Redirecting..." : `Buy now · ${money(price)}`}
+        {loading ? "Redirecting..." : `Upgrade to Premium · ${money(price)}`}
       </Button>
 
       {error ? (

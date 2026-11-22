@@ -62,6 +62,7 @@ const menuItemsByRole: Record<DashboardRole, MenuItem[]> = {
     { label: "Add Item", href: "/dashboard/vendor/menu/new", icon: PlusCircle },
     { label: "Orders", href: "/dashboard/vendor/orders", icon: ClipboardList },
     { label: "Subscription", href: "/dashboard/vendor/subscription", icon: CreditCard },
+        { label: "Settings", href: "/dashboard/vendor/settings", icon: Settings },
   ],
   admin: [
     { label: "Overview", href: "/dashboard/admin", icon: LayoutDashboard, exact: true },

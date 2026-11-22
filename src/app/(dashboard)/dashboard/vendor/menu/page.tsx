@@ -8,6 +8,7 @@ import type { MenuItemStatus } from "@/lib/types";
 import { getMyMenu } from "@/lib/api/menu-item";
 import EditMenuItemDialog from "@/components/dashboard/vendor/menu/EditMenuItemDialog";
 import DeleteMenuItemDialog from "@/components/dashboard/vendor/menu/DeleteMenuItemDialog";
+import AvailabilityToggle from "@/components/dashboard/vendor/menu/AvailabilityToggle";
 
 // Reads the session, so it blocks instead of prerendering.
 export const instant = false;
@@ -107,13 +108,22 @@ const VendorMenuPage = async () => {
                     </Link>
                   ) : (
                     <span className="font-sans text-[0.75rem] text-[#7A6455]">
-                      {status === "pending" ? "Awaiting review" : "Not public yet"}
+                      {status === "pending"
+                        ? "Awaiting review"
+                        : "Not public yet"}
                     </span>
                   )}
                 </div>
 
                 {/* Manage */}
                 <div className="mt-4 flex flex-wrap gap-2 border-t border-[#EADBC8] pt-4 font-sans">
+                  {(status === "approved" || status === "inactive") && (
+                    <AvailabilityToggle
+                      id={id}
+                      name={item.name}
+                      status={status}
+                    />
+                  )}
                   <EditMenuItemDialog
                     item={{
                       id,

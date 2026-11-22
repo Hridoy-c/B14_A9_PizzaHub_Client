@@ -41,7 +41,7 @@ const dateFormat = new Intl.DateTimeFormat("en-GB", {
 });
 
 const toolbarClass =
-  "flex flex-col gap-4 rounded-3xl border border-[#EADBC8] bg-[#FBF6EF] p-4 sm:p-5";
+  "flex min-w-0 max-w-full flex-col gap-4 rounded-3xl border border-[#EADBC8] bg-[#FBF6EF] p-4 sm:p-5";
 
 const headClass =
   "h-11 px-4 font-sans text-[0.6875rem] font-medium uppercase tracking-[0.14em] text-[#7A6455]";
@@ -155,8 +155,8 @@ const UserCard = ({
   isSelf: boolean;
   canBlock: boolean;
 }) => (
-  <li className="overflow-hidden rounded-3xl border border-[#EADBC8] bg-[#FBF6EF] p-4">
-    <div className="flex items-start gap-3">
+  <li className="min-w-0 max-w-full overflow-hidden rounded-3xl border border-[#EADBC8] bg-[#FBF6EF] p-4">
+    <div className="flex min-w-0 items-start gap-3">
       <Avatar className="size-11 shrink-0 ring-2 ring-[#EADBC8]">
         <AvatarImage src={user.image ?? undefined} alt={user.name} />
         <AvatarFallback className="bg-[#3B2417] font-display text-[0.9375rem] text-[#F5EDE3]">
@@ -206,7 +206,7 @@ const UserCard = ({
 );
 
 const UsersSkeleton = () => (
-  <div aria-busy="true" className="flex flex-col gap-6">
+  <div aria-busy="true" className="flex min-w-0 flex-col gap-6">
     <div className={toolbarClass}>
       <div className="h-[3.25rem] animate-pulse rounded-full bg-[#EADBC8]" />
       <div className="h-10 w-full animate-pulse rounded-full bg-[#EADBC8] sm:w-72" />
@@ -255,8 +255,12 @@ const UsersContent = async ({ searchParams }: PageProps) => {
   return (
     <>
       <div className={toolbarClass}>
-        <UserSearchBar />
-        <UserFilters resultCount={users.length} />
+        <div className="min-w-0 max-w-full">
+          <UserSearchBar />
+        </div>
+        <div className="min-w-0 max-w-full overflow-x-auto">
+          <UserFilters resultCount={users.length} />
+        </div>
       </div>
 
       {users.length === 0 ? (
@@ -265,7 +269,10 @@ const UsersContent = async ({ searchParams }: PageProps) => {
         </p>
       ) : (
         <>
-          <ul aria-label="Users" className="flex flex-col gap-3 xl:hidden">
+          <ul
+            aria-label="Users"
+            className="flex min-w-0 max-w-full flex-col gap-3 xl:hidden"
+          >
             {users.map((user) => {
               const userRole = dashboardRole(user.role);
               const isSelf = user.id === currentUser?.id;
@@ -383,7 +390,7 @@ const UsersContent = async ({ searchParams }: PageProps) => {
 
 const AdminUsersPage = ({ searchParams }: PageProps) => {
   return (
-    <section className="flex min-w-0 flex-col gap-6">
+    <section className="flex w-full min-w-0 max-w-full flex-col gap-6 [contain:inline-size]">
       <header>
         <h1 className="font-display text-[clamp(1.75rem,1.4rem+1vw,2.5rem)] leading-none tracking-tight text-[#3B2417]">
           Manage Users

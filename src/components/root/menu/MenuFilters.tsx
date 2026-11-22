@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, MapPin, X } from "lucide-react";
+import { ArrowUpDown, ChevronDown, MapPin, X } from "lucide-react";
 import { PIZZA_CATEGORIES } from "@/lib/types";
 import { useMenuParams } from "@/hooks/useMenuParams";
 
@@ -8,6 +8,12 @@ type MenuFiltersProps = {
   locations: string[];
   resultCount?: number;
 };
+
+const SORT_OPTIONS = [
+  { value: "newest", label: "Newest first" },
+  { value: "price-asc", label: "Price: low to high" },
+  { value: "price-desc", label: "Price: high to low" },
+] as const;
 
 type ActiveChip = {
   key: string;
@@ -23,12 +29,18 @@ const MenuFilters = ({ locations, resultCount }: MenuFiltersProps) => {
 
   const query = searchParams.get("q") ?? "";
   const location = searchParams.get("location") ?? "";
+    const sort =
+    SORT_OPTIONS.find((item) => item.value === searchParams.get("sort"))
+      ?.value ?? "newest";
   const activeCategory = PIZZA_CATEGORIES.find(
     (item) => item.value === searchParams.get("category"),
   );
   const category = activeCategory?.value ?? "";
 
-  const hasFilters = Boolean(query || category || location);
+
+  const hasFilters = Boolean(
+    query || category || location || (sort && sort !== "newest"),
+  );
 
   const locationOptions =
     location && !locations.includes(location)
@@ -102,33 +114,65 @@ const MenuFilters = ({ locations, resultCount }: MenuFiltersProps) => {
           })}
         </div>
 
-        <div className="relative w-full shrink-0 lg:w-64">
-          <label htmlFor="menu-location" className="sr-only">
-            Filter by location
-          </label>
-          <MapPin
-            className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-[#B9733A]"
-            aria-hidden="true"
-          />
-          <select
-            id="menu-location"
-            value={location}
-            onChange={(event) =>
-              update({ location: event.target.value || null })
-            }
-            className="h-11 w-full appearance-none rounded-full border border-[#EADBC8] bg-white pl-10 pr-10 font-sans text-[0.875rem] text-[#3B2417] outline-none transition-all hover:border-[#3B2417] focus:border-[#B9733A] focus:ring-4 focus:ring-[#B9733A]/15"
-          >
-            <option value="">All locations</option>
-            {locationOptions.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </select>
-          <ChevronDown
-            className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-[#7A6455]"
-            aria-hidden="true"
-          />
+               <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
+          <div className="relative w-full shrink-0 lg:w-56">
+            <label htmlFor="menu-location" className="sr-only">
+              Filter by location
+            </label>
+            <MapPin
+              className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-[#B9733A]"
+              aria-hidden="true"
+            />
+            <select
+              id="menu-location"
+              value={location}
+              onChange={(event) =>
+                update({ location: event.target.value || null })
+              }
+              className="h-11 w-full appearance-none rounded-full border border-[#EADBC8] bg-white pl-10 pr-10 font-sans text-[0.875rem] text-[#3B2417] outline-none transition-all hover:border-[#3B2417] focus:border-[#B9733A] focus:ring-4 focus:ring-[#B9733A]/15"
+            >
+              <option value="">All locations</option>
+              {locationOptions.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-[#7A6455]"
+              aria-hidden="true"
+            />
+          </div>
+
+          <div className="relative w-full shrink-0 lg:w-52">
+            <label htmlFor="menu-sort" className="sr-only">
+              Sort by price
+            </label>
+            <ArrowUpDown
+              className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-[#B9733A]"
+              aria-hidden="true"
+            />
+            <select
+              id="menu-sort"
+              value={sort}
+              onChange={(event) =>
+                update({
+                  sort: event.target.value === "newest" ? null : event.target.value,
+                })
+              }
+              className="h-11 w-full appearance-none rounded-full border border-[#EADBC8] bg-white pl-10 pr-10 font-sans text-[0.875rem] text-[#3B2417] outline-none transition-all hover:border-[#3B2417] focus:border-[#B9733A] focus:ring-4 focus:ring-[#B9733A]/15"
+            >
+              {SORT_OPTIONS.map((item) => (
+                <option key={item.value} value={item.value}>
+                  {item.label}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-[#7A6455]"
+              aria-hidden="true"
+            />
+          </div>
         </div>
       </div>
 

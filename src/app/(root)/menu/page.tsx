@@ -11,10 +11,15 @@ export const metadata = {
     "The full PizzaHub menu — classic and gourmet pizzas, vegetarian favourites, meat lovers, sides, drinks and desserts, baked to order.",
 };
 
+// PageProps
 type PageProps = {
-  searchParams: Promise<{ q?: string; category?: string; location?: string }>;
+  searchParams: Promise<{
+    q?: string;
+    category?: string;
+    location?: string;
+    sort?: string;
+  }>;
 };
-
 const loadAllPizzas = cache(() => getPizzas());
 
 const toolbarClass =
@@ -67,12 +72,14 @@ const MenuToolbar = async () => {
 };
 
 const MenuSections = async ({ searchParams }: PageProps) => {
-  const { q, category, location } = await searchParams;
+
+  const { q, category, location, sort } = await searchParams;
 
   const allPizzas = await getPizzas({
     q: q?.trim(),
     category,
     location,
+    sort,
   });
 
   const hasFilters = Boolean(q?.trim() || category || location);

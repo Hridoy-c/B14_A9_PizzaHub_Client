@@ -32,6 +32,8 @@ const getInitials = (value: string) =>
     .map((part) => part.charAt(0).toUpperCase())
     .join("") || "P";
 
+const getPlan = (tx: Transaction) => tx.plan?.replace(/-/g, " ") ?? "premium";
+
 const details = (tx: Transaction) => ({
   name: tx.user?.name ?? tx.userName ?? "Unknown user",
   email: tx.user?.email ?? tx.customer_email ?? "—",
@@ -91,6 +93,15 @@ const TransactionsTable = ({
               <dl className="grid grid-cols-2 gap-x-4 gap-y-2 font-sans text-[0.8125rem]">
                 <div>
                   <dt className="text-[0.6875rem] uppercase tracking-[0.14em] text-[#7A6455]">
+                    Plan
+                  </dt>
+                  <dd className="mt-0.5 capitalize text-[#3B2417]">
+                    {getPlan(tx)}
+                  </dd>
+                </div>
+
+                <div>
+                  <dt className="text-[0.6875rem] uppercase tracking-[0.14em] text-[#7A6455]">
                     Amount
                   </dt>
                   <dd className="mt-0.5 text-[#3B2417]">
@@ -126,6 +137,7 @@ const TransactionsTable = ({
           <TableHeader className="bg-[#F5EDE3]">
             <TableRow className="border-[#EADBC8] hover:bg-transparent">
               <TableHead className={headClass}>Customer</TableHead>
+              <TableHead className={headClass}>Plan</TableHead>
               <TableHead className={`${headClass} hidden lg:table-cell`}>
                 Payment ID
               </TableHead>
@@ -146,6 +158,12 @@ const TransactionsTable = ({
                 >
                   <TableCell className={cellClass}>
                     <Customer tx={tx} />
+                  </TableCell>
+
+                  <TableCell
+                    className={`${cellClass} font-sans text-[0.875rem] capitalize text-[#3B2417]`}
+                  >
+                    {getPlan(tx)}
                   </TableCell>
 
                   <TableCell

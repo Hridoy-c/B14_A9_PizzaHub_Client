@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Star } from "lucide-react";
+import { ArrowRight, Crown, MapPin, Star } from "lucide-react";
 import type { CardPizza } from "@/lib/types";
 
 type PizzaCardProps = {
@@ -53,6 +53,14 @@ const PizzaCard = ({
 
       <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-[#EADBC8]">
         {media}
+
+        {pizza.vendorPremium && (
+          <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-[#3B2417] px-2.5 py-1 font-sans text-[0.6875rem] uppercase tracking-[0.12em] text-[#F5EDE3] shadow-sm">
+            <Crown className="size-3 text-[#F2C14E]" aria-hidden="true" />
+            Premium
+          </span>
+        )}
+
         {typeof pizza.rating === "number" && (
           <span className="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-[#F5EDE3]/95 px-2.5 py-1 font-display text-[0.8125rem] leading-none text-[#7A2E12] shadow-sm">
             {pizza.rating.toFixed(1)}
@@ -77,6 +85,23 @@ const PizzaCard = ({
       {pizza.description && (
         <p className="mt-2 line-clamp-2 flex-1 font-body text-[0.8125rem] leading-relaxed text-[#7A6455]">
           {pizza.description}
+        </p>
+      )}
+
+      {(pizza.location || pizza.vendorName) && (
+        <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 font-sans text-[0.6875rem] uppercase tracking-[0.1em] text-[#7A6455]">
+          {pizza.location && (
+            <span className="inline-flex items-center gap-1">
+              <MapPin className="size-3 text-[#B9733A]" aria-hidden="true" />
+              {pizza.location}
+            </span>
+          )}
+          {pizza.location && pizza.vendorName && (
+            <span aria-hidden="true">·</span>
+          )}
+          {pizza.vendorName && (
+            <span className="truncate">{pizza.vendorName}</span>
+          )}
         </p>
       )}
 

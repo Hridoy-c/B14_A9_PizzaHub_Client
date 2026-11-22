@@ -11,10 +11,13 @@ const toList = (json: unknown): MenuItem[] => {
   return Array.isArray(data) ? (data as MenuItem[]) : [];
 };
 
+export type MenuSort = "newest" | "price-asc" | "price-desc";
+
 export type MenuFilters = {
   q?: string;
   category?: string;
   location?: string;
+  sort?: MenuSort | string;
 };
 
 export const getPizzas = async (
@@ -26,6 +29,9 @@ export const getPizzas = async (
     if (filters.q) params.set("q", filters.q);
     if (filters.category) params.set("category", filters.category);
     if (filters.location) params.set("location", filters.location);
+    if (filters.sort && filters.sort !== "newest") {
+      params.set("sort", filters.sort);
+    }
 
     const query = params.toString();
 

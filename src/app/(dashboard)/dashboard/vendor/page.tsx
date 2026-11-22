@@ -11,6 +11,8 @@ import { requireUser } from "@/lib/cors/Session";
 import { getOrdersByVendor } from "@/lib/api/orders";
 import { getMyMenu } from "@/lib/api/menu-item";
 import OrderActions from "@/components/dashboard/vendor/orders/OrderActions";
+import { Crown, CheckCircle2 } from "lucide-react";
+import { getPlanStatus } from "@/lib/actions/payment";
 
 // Reads the session, so it cannot be prerendered.
 export const instant = false;
@@ -38,9 +40,10 @@ const priceOf = (o: { item?: { price?: number } | null }) =>
 const VendorOverviewPage = async () => {
   const user = await requireUser();
 
-  const [orders, menu] = await Promise.all([
+   const [orders, menu, plan] = await Promise.all([
     getOrdersByVendor(user.id),
     getMyMenu(user.id),
+    getPlanStatus(user.id),
   ]);
 
   const today = startOfUtcDay(new Date());
@@ -107,18 +110,32 @@ const VendorOverviewPage = async () => {
     )
     .slice(0, 4);
 
-  const stats = [
+   const stats = [
     {
-      label: "Needs action",
+      label: "Total menu items",
+      value: String(menu.length),
+      hint: "All statuses",
+      icon: UtensilsCrossed,
+      accent: false,
+    },
+    {
+      label: "Active items",
+      value: String(liveMenuCount),
+      hint: "Approved and visible",
+      icon: CheckCircle2,
+      accent: false,
+    },
+    {
+      label: "Pending orders",
       value: String(pending.length),
-      hint: pending.length ? "Pending orders" : "All clear",
+      hint: pending.length ? "Needs your decision" : "All clear",
       icon: Hourglass,
       accent: pending.length > 0,
     },
     {
-      label: "Today's orders",
-      value: String(todaysOrders.length),
-      hint: "Placed today",
+      label: "Accepted orders",
+      value: String(accepted.length),
+      hint: "Confirmed by you",
       icon: ClipboardList,
       accent: false,
     },
@@ -130,10 +147,10 @@ const VendorOverviewPage = async () => {
       accent: false,
     },
     {
-      label: "Menu items",
-      value: String(menu.length),
-      hint: `${liveMenuCount} live`,
-      icon: UtensilsCrossed,
+      label: "Current plan",
+      value: plan.premium ? "Premium" : "Free",
+      hint: plan.premium ? "Unlimited items" : "Up to 3 items",
+      icon: Crown,
       accent: false,
     },
   ];
@@ -161,7 +178,7 @@ const VendorOverviewPage = async () => {
       </header>
 
       {/* Stat cards */}
-      <ul className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 lg:grid-cols-4">
+      <ul className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 lg:grid-cols-3">
         {stats.map(({ label, value, hint, icon: Icon, accent }) => (
           <li
             key={label}

@@ -1,7 +1,7 @@
 import { cache } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import {
   ArrowRight,
   Bike,
@@ -109,13 +109,15 @@ export const generateMetadata = async ({
 };
 
 const MenuDetailsPage = async ({ params }: PageProps) => {
+  const user = await getCurrentUser();
+  if (!user) redirect("/sign-in");
+
   const { id } = await params;
   const pizza = await loadPizza(id);
 
   if (!pizza) notFound();
 
-  const user = await getCurrentUser();
-  const role = String(user?.role ?? "").toLowerCase();
+  const role = String(user.role ?? "").toLowerCase();
   const canOrder = role === "customer";
 
   const related = await loadRelated(pizza);
@@ -273,7 +275,7 @@ const MenuDetailsPage = async ({ params }: PageProps) => {
             </a>
           )}
 
-          {/* Ordering — customers only */}
+          {/* Ordering: customers only */}
           {canOrder ? (
             <OrderForm
               itemId={pizza.id}
@@ -282,25 +284,13 @@ const MenuDetailsPage = async ({ params }: PageProps) => {
             />
           ) : (
             <div className="mt-6 rounded-2xl border border-dashed border-[#EADBC8] bg-[#F5EDE3] p-4">
-              {user ? (
-                <p className="font-sans text-[0.8125rem] leading-relaxed text-[#7A6455]">
-                  Only customer accounts can place orders. You are signed in as{" "}
-                  <span className="uppercase tracking-wide text-[#3B2417]">
-                    {role}
-                  </span>
-                  .
-                </p>
-              ) : (
-                <p className="font-sans text-[0.8125rem] leading-relaxed text-[#7A6455]">
-                  <Link
-                    href="/sign-in"
-                    className="text-[#B9733A] underline underline-offset-2 transition-colors hover:text-[#7A2E12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B9733A]/50"
-                  >
-                    Sign in
-                  </Link>{" "}
-                  as a customer to order this item.
-                </p>
-              )}
+              <p className="font-sans text-[0.8125rem] leading-relaxed text-[#7A6455]">
+                Only customer accounts can place orders. You are signed in as{" "}
+                <span className="uppercase tracking-wide text-[#3B2417]">
+                  {role}
+                </span>
+                .
+              </p>
             </div>
           )}
 

@@ -41,6 +41,8 @@ export type MenuItem = AddItemPayload & {
   _id: string;
   createdAt: string;
   updatedAt: string;
+  /** Added by the API: the vendor currently has an active premium plan. */
+  vendorPremium?: boolean;
 };
 
 /**
@@ -58,6 +60,12 @@ export type CardPizza = {
   /** Display label, e.g. "Classic Pizzas". */
   category?: string;
   emoji?: string;
+  /** Restaurant area / city shown on cards. */
+  location?: string;
+  /** Restaurant name shown on cards. */
+  vendorName?: string;
+  /** Premium vendors get a badge and featured placement. */
+  vendorPremium?: boolean;
 };
 
 export const MENU_ITEM_STATUSES = [
@@ -116,5 +124,6 @@ export type Transaction = {
   payment_intent?: string;
   amount?: number;
   currency?: string;
+    plan?: string;
   user?: { name?: string | null; email?: string; image?: string | null };
 };
